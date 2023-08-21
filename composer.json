@@ -1,0 +1,21 @@
+{
+    "name": "dmytro/zuljin_bot",
+    "description": "telegram chat bot",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Telegram\\": "src/Telegram",
+            "Controllers\\": "src/Controllers",
+            "Bot\\": "src/Bot"
+        }
+    },
+    "authors": [
+        {
+            "name": "Dimi-Dun-Morogh",
+            "email": "darnelbro@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.5"
+    }
+}
