@@ -13,10 +13,36 @@ $dotenv->load();
 
 $key = $_ENV['TG_BOT_KEY'];
 
-//dev purp
-$ngrockUrl =  "https://67e7-78-26-242-170.ngrok-free.app";
 
-$webhookurl = $ngrockUrl . "/zuljin_bot/public/index.php";
 
 $bot = new Bot(new  Telegram($key));
+
+$bot->addCallback("hello", function (Telegram $tg, mixed $update) {
+  $whereTo = $update['message']['chat']['id'];
+  $tg->sendMessage("world", $whereTo);
+});
+
+$bot->addCallback("new_chat_participant", function (Telegram $tg, mixed $update) {
+  $whereTo = $update['message']['chat']['id'];
+  $tg->sendMessage("greetings mon", $whereTo);
+});
+
 $bot->start();
+
+
+
+
+
+
+
+
+
+$setWebHook  = function () {
+  global $bot;
+
+  $webHookUrl = $_ENV['WEBHOOK_URL'] . "/zuljin_bot/public/index.php";
+  $bot->telegram->setWebHook($webHookUrl);
+};
+
+
+return $setWebHook;

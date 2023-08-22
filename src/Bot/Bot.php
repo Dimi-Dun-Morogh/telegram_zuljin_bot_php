@@ -8,6 +8,7 @@ use Telegram\Telegram;
 
 class Bot
 {
+  private $callbacks = [];
 
   public function __construct(public Telegram $telegram)
   {
@@ -17,7 +18,36 @@ class Bot
   {
     $update = $this->telegram->getWebhookUpdate();
     if (!$update || !$update['message']) return;
-    $fromId = $update['message']['from']['id'];
-    $this->telegram->sendMessage('echoing', $fromId);
+    $command = $this->getCommand($update);
+
+    $this->invokeCb($command, $update);
+
+  }
+
+  private function getCommand(mixed $update) {
+    $infoKeys = ['text', 'new_chat_participant', 'left_chat_member'];
+    $message = $update['message'];
+    $command = '';
+    foreach($infoKeys as $key) {
+      if(array_key_exists($key, $message)) {
+       $command = $key === 'text' ?  $message[$key] : $key;
+       break;
+      }
+    }
+    return $command;
+
+  }
+
+  public function addCallback(string $onText, callable $cb){
+    $this->callbacks[$onText]  = $cb;
+  }
+  private function invokeCb(string $command, mixed $update){
+
+    if($this->callbacks[$command]) {
+      $fnc = $this->callbacks[$command];
+
+      $fnc($this->telegram,  $update);
+
+    }
   }
 }
