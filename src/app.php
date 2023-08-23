@@ -1,12 +1,12 @@
 <?php
-
 declare(strict_types=1);
-
 require __DIR__ . "/../vendor/autoload.php";
-
 use Bot\Bot;
+use Services\JokeService;
 use Dotenv\Dotenv;
 use Telegram\Telegram;
+
+
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -17,15 +17,10 @@ $key = $_ENV['TG_BOT_KEY'];
 
 $bot = new Bot(new  Telegram($key));
 
-$bot->addCallback("hello", function (Telegram $tg, mixed $update) {
-  $whereTo = $update['message']['chat']['id'];
-  $tg->sendMessage("world", $whereTo);
-});
+$bot->initServices([new JokeService]);
 
-$bot->addCallback("new_chat_participant", function (Telegram $tg, mixed $update) {
-  $whereTo = $update['message']['chat']['id'];
-  $tg->sendMessage("greetings mon", $whereTo);
-});
+$bot->addCallback(["анекдот", "Анекдот"], [JokeService::class, 'jokesHandler']);
+
 
 $bot->start();
 
