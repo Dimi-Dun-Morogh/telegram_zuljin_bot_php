@@ -8,7 +8,7 @@ use Exception;
 
 class Telegram
 {
-  private string $baseUrl = 'http://api.telegram.org/bot';
+  public string $baseUrl = 'http://api.telegram.org/bot';
 
   public function __construct(string $apiKey)
   {
@@ -18,28 +18,35 @@ class Telegram
   private function api(string $method, array $params = [], array $keyboard = [])
   {
 
-    try {
-      $url = $this->baseUrl . "/" . $method;
-      if (!empty($params)) {
-        $url = $url . "?" . http_build_query($params)  ;
-      }
 
-      if(!empty($keyboard))  {
-        $keyboard = json_encode($keyboard);
-        $url = $url ."&reply_markup=$keyboard";
-      }
+    //   header('Content-Type: application/json;charset=utf-8');
 
-      $data = file_get_contents($url);
-      if ($data) {
-        $data = json_decode($data, true);
-      }
-      return $data;
-    }
-    catch(Exception $e){
-      file_put_contents(__DIR__ . '../../../log_err.txt', json_encode($e));
+
+    $url = $this->baseUrl . "/" . $method;
+    if (!empty($params)) {
+      $url = $url . "?" . http_build_query($params);
     }
 
+    if (!empty($keyboard)) {
+      $keyboard = json_encode($keyboard);
+      $url = $url . "&reply_markup=$keyboard";
+    }
 
+    $data = file_get_contents($url);
+    file_put_contents(__DIR__ . '../../../log.json', $data);
+    if ($data) {
+      $data = json_decode($data, true);
+    }
+
+    if ($data === false) {
+      // An error occurred, write error message to file
+      $error = error_get_last();
+      $message = $error['message'];
+      file_put_contents(__DIR__ . '../../../logerror.txt', $message);
+    }
+    var_dump($data);
+
+    return $data;
   }
 
   public function getUpdates()
@@ -49,10 +56,13 @@ class Telegram
   }
   public function sendMessage(string $message, string|int $chatId, array $params = [], array $keyboard = [])
   {
-    $this->api(
-      'sendMessage',
-      array_merge(['chat_id' => $chatId, 'text' => $message], $params)
-    , $keyboard);
+    $url = $this->baseUrl . "/sendMessage?"  . "&text=$message&chat_id=$chatId&" . http_build_query($params);
+    if (!empty($keyboard)) {
+      $keyboard = json_encode($keyboard);
+      $url = $url . "&reply_markup=$keyboard";
+    }
+    file_get_contents($url);
+
   }
 
   public function setWebHook(string $url)
@@ -73,8 +83,15 @@ class Telegram
     return $update;
   }
 
-  public function answerCallbackQuery (int|string $id, array $params = []){
-    $this->api('answerCallbackQuery', array_merge(['callback_query_id'=>$id], $params));
-  } 
+  public function answerCallbackQuery(int|string $id, array $params = [])
+  {
+    $this->api('answerCallbackQuery', array_merge(['callback_query_id' => $id], $params));
+  }
 
+  public function sendPhoto(string $imgUrl, string $captions =  '',  array $params)
+  { $url  = $this->baseUrl  . "/sendPhoto?" . "&photo=" .  urlencode($imgUrl)
+    ."&caption=" . $captions . "&" . http_build_query($params);
+
+    file_get_contents($url);
+  }
 }

@@ -1,3 +1,6 @@
 .env
 vendor
 log.json
+log.txt
+logerror.txt
+logerror.json

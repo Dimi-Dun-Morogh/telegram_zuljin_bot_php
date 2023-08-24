@@ -19,6 +19,8 @@ class Bot
   public function start()
   {
     $update = $this->telegram->getWebhookUpdate();
+    $command = '';
+    if(!$update) return;
     if ($update && $update['message']){
       $command = $this->getCommand($update);
     }else if ($update && $update['callback_query']){
@@ -37,7 +39,7 @@ class Bot
     foreach ($infoKeys as $key) {
       if (array_key_exists($key, $message)) {
 
-        $command = $key === 'text' ? explode(' ', $message[$key])[0]   : $key;
+        $command = $key === 'text' ? mb_strtolower($message['text'])   : $key;
         break;
       }
     }

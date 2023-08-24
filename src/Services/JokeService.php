@@ -30,22 +30,23 @@ class JokeService
   public function jokesHandler(mixed $update, Telegram $telegram)
   {
     $joke = $this->getJoke();
-    $replyTo = null;
+    $userString = null;
     $callBackQueryId = null;
+    $from = null;
     // if handler invoked from button press
     $isCbQuery = key_exists('callback_query', $update);
     if ($isCbQuery) {
-      $callBackQueryId = ['update']['callback_query']['id'];
-
-
+      $callBackQueryId = $update['callback_query']['id'];
       $update = $update['callback_query'];
-      $replyTo = $update['message']['reply_to_message']['message_id'];
-    } else {
-      $replyTo = $update['message']['message_id'];
+      $from = $update['from'];
+    }else {
+      $from = $update['message']["from"];
     }
 
+    $replyTo = $callBackQueryId? null :  $update['message']['message_id'];
     $chatId = $update['message']['chat']['id'];
-
+    $userString = "Анекдот для " . "<a href='tg://user?id={$from['id']}'>{$from['first_name']}</a>"  . '%0A' . '%0A';
+   // $userString = "";
     $keyboard = [
       "inline_keyboard" => [
         [
@@ -57,7 +58,7 @@ class JokeService
       ]
     ];
 
-    $telegram->sendMessage("<b>$joke</b>", $chatId, [
+    $telegram->sendMessage("$userString <b>$joke</b>", $chatId, [
       "reply_to_message_id" => $replyTo,"parse_mode"=>'HTML'
     ], $keyboard);
 
