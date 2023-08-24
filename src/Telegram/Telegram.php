@@ -54,12 +54,13 @@ class Telegram
 
   private function cGet(string $url)
   {
+    Utils::writeLog('log.txt', $url);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $res = curl_exec($ch);
     curl_close($ch);
-    if(!$res) {
+    if (!$res) {
       $error = error_get_last();
       $message = $error['message'];
       Utils::writeLog('logerror.txt', $message);
@@ -108,10 +109,11 @@ class Telegram
     $this->api('answerCallbackQuery', array_merge(['callback_query_id' => $id], $params));
   }
 
-  public function sendPhoto(string $imgUrl, string $captions =  '',  array $params=[], array $keyboard = [])
+  public function sendPhoto(string $imgUrl, string $captions =  '',  array $params = [], array $keyboard = [])
 
   {
-    $captions = rawurlencode($captions);
+
+   $captions = rawurlencode($captions);
 
     $url  = $this->baseUrl  . "/sendPhoto?" . "&photo=" .  urlencode($imgUrl)
       . "&caption=" . $captions . "&" . http_build_query($params);
@@ -121,6 +123,39 @@ class Telegram
 
       $url = $url . "&&reply_markup=$keyboard";
     }
+    $this->cGet($url);
+  }
+
+  public function editMessageText(string $text, array $params, array $keyboard = [])
+  {
+    $url = $this->baseUrl . "/editMessageText?" . http_build_query($params)
+      . "&text=" .  rawurlencode($text);
+
+    if (!empty($keyboard)) {
+      $keyboard = json_encode($keyboard);
+
+      $url = $url . "&&reply_markup=$keyboard";
+    }
+
+    $this->cGet($url);
+  }
+
+  /**
+   * https://core.telegram.org/bots/api#inputmedia
+   */
+  public function editMessageMedia(array $params, array $media,  array $keyboard = [])
+  {
+    $url = $this->baseUrl . "/editMessageMedia?" . http_build_query($params) . "&media=" . json_encode($media);
+    if (!empty($keyboard)) {
+      $keyboard = json_encode($keyboard);
+
+      $url = $url . "&reply_markup=$keyboard";
+    }
+    Utils::writeLog('log.txt', $url);
+    $this->cGet($url);
+  }
+  public function deleteMessage(string|int $chatId, string|int $messageId){
+    $url =$this->baseUrl . "/deleteMessage?chat_id=" .$chatId ."&message_id=" . $messageId;
     $this->cGet($url);
   }
 }

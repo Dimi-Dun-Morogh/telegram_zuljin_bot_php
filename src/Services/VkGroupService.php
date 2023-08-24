@@ -53,18 +53,30 @@ class VkGroupService
       . "<i>" . $authorString . "  " . $date_string . "</i>" . "\r\n"  . "\r\n"
       . "comments: " . $comments . " " . "likes: " . $likes .  "\r\n";
 
-    return  [$msg, $postImage];
+    return  [$msg,$postImage];
   }
 
   public function getPostHandler(mixed $update, Telegram $telegram)
   {
     $replyTo = null;
     $Offset = 1;
+    $isCbQuery = false;
 
     if (key_exists('callback_query', $update)) {
-
+      $isCbQuery = true;
       $Offset = explode(':', $update['callback_query']['data'])[1];
       $update = $update['callback_query'];
+      $from = $update['from'];
+      $whoPressed = "<a href='tg://user?id={$from['id']}'>{$from['first_name']}</a> нажал на кнопку"
+        .  "\r\n" . "\r\n";;
+
+      $telegram->editMessageText($whoPressed . "Just a second 'Mon, da Zul be working on dat task right now", [
+        'chat_id' => $update['message']['chat']['id'],
+         'message_id' => $update['message']['message_id'],
+        'parse_mode' => 'HTML',
+      ]);
+
+      sleep(1);
     } else {
       $replyTo = $update['message']['message_id'];
     }
@@ -79,8 +91,27 @@ class VkGroupService
     ]];
     [$msg, $image] = $this->getWallPost($Offset);
 
+
+
+    if ($isCbQuery) {
+      //  if new post has image  send new msg else edit old one
+      if ($image) {
+        $imageLink = "<a href='$image'>^_^</>";
+       $msg = "$imageLink \r\n".  $msg;
+      }
+      $telegram->editMessageText($msg, [
+        'chat_id' => $chatId, 'message_id' => $update['message']['message_id'],
+        'parse_mode' => 'HTML',
+      ], $keyboard);
+
+      return;
+    }
+
+
     if ($image) {
-      $telegram->sendPhoto($image, $msg, ['chat_id' => $chatId, 'parse_mode' => 'HTML'], $keyboard);
+      $imageLink = "<a href='$image'>^_^</>";
+      $telegram->sendMessage("$imageLink \r\n".  $msg, $chatId, ["reply_to_message_id" => $replyTo, "parse_mode" => "HTML"], $keyboard);
+
       return;
     }
 

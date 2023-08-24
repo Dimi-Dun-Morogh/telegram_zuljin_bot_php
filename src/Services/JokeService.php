@@ -58,12 +58,21 @@ class JokeService
       ]
     ];
 
+    if($isCbQuery) {
+      $telegram->editMessageText("$userString <b>$joke</b>", ['chat_id'=>$chatId,'message_id'=>$update['message']['message_id'],
+      'parse_mode'=> 'HTML',
+    ], $keyboard);
+
+      $telegram->answerCallbackQuery($callBackQueryId);
+      return;
+    }
+
     $telegram->sendMessage("$userString <b>$joke</b>", $chatId, [
       "reply_to_message_id" => $replyTo,"parse_mode"=>'HTML'
     ], $keyboard);
 
-    if($isCbQuery) {
-      $telegram->answerCallbackQuery($callBackQueryId);
-    }
+    // if($isCbQuery) {
+    //   $telegram->answerCallbackQuery($callBackQueryId);
+    // }
   }
 }
