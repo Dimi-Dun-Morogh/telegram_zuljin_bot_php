@@ -5,24 +5,18 @@ declare(strict_types=1);
 namespace Services;
 
 use Telegram\Telegram;
-
-function escapeMarkdown($string)
-{
-  $markdownChars = array('*', '_', '~', '', '|', '-', ',', '.');
-  $escapedChars = array("\*", "\_", "\~", "\\", "\|", '\-', '\,', '\.');
-  return str_replace($markdownChars, $escapedChars, $string);
-}
+use Utils\Utils;
 
 
 class VkGroupService
 {
 
-  public function getWallPost()
+  public function getWallPost(int|string $offset = 1)
   {
     $apiKey = $_ENV['VK_API_KEY'];
     $groupId = $_ENV['VK_GRP'];
     $query = http_build_query([
-      'access_token' => $apiKey, 'owner_id' => $groupId, 'count' => 2,
+      'access_token' => $apiKey, 'owner_id' => $groupId, 'offset' => $offset, 'count' => 1,
       'extended' => true, 'v' => '5.131'
     ]);
     $baseUrl = "https://api.vk.com/method/wall.get?" . $query;
@@ -30,7 +24,7 @@ class VkGroupService
 
     $groupName = $data['response']['groups'][0]['name'];
 
-    $post = $data['response']['items'][1];
+    $post = $data['response']['items'][0];
     $authorString = '';
     foreach ($data['response']['profiles'] as $profile) {
       if ($profile['id'] === $post['from_id']) {
@@ -54,31 +48,42 @@ class VkGroupService
     $likes = $post['likes']['count'];
 
 
-    $msg = $groupName . '%0A' . '%0A'
-      . "<b>" . $postText .  "</b>"  . '%0A'  . '%0A'
-      . "<i>" . $authorString . "  " . $date_string . "</i>" . '%0A'  . '%0A'
-      . "comments: " . $comments . " " . "likes: " . $likes .  '%0A';
+    $msg = $groupName . "\r\n"
+      . "<b>" . $postText .  "</b>"  . "\r\n"  . "\r\n"
+      . "<i>" . $authorString . "  " . $date_string . "</i>" . "\r\n"  . "\r\n"
+      . "comments: " . $comments . " " . "likes: " . $likes .  "\r\n";
 
     return  [$msg, $postImage];
   }
 
   public function getPostHandler(mixed $update, Telegram $telegram)
   {
-    $replyTo = $update['message']['message_id'];
-    $chatId = $update['message']['chat']['id'];
+    $replyTo = null;
+    $Offset = 1;
 
-    [$msg, $image] = $this->getWallPost();
+    if (key_exists('callback_query', $update)) {
 
-    if ($image) {
-
-      $url = $telegram->baseUrl;
-
-      file_put_contents(__DIR__ . '../../../log.txt',  $url);
-      $telegram->sendPhoto($image, $msg, ['chat_id' => $chatId, 'parse_mode' => 'HTML']);
-
-       return;
+      $Offset = explode(':', $update['callback_query']['data'])[1];
+      $update = $update['callback_query'];
+    } else {
+      $replyTo = $update['message']['message_id'];
     }
 
-    $telegram->sendMessage($msg, $chatId, ["reply_to_message_id" => $replyTo, "parse_mode" => "HTML"]);
+
+    $chatId = $update['message']['chat']['id'];
+    $nextOffset = $Offset + 1;
+    $keyboard = ['inline_keyboard' => [
+      [
+        ['text' => 'следующий', "callback_data" => "vk_next_post:$nextOffset"]
+      ]
+    ]];
+    [$msg, $image] = $this->getWallPost($Offset);
+
+    if ($image) {
+      $telegram->sendPhoto($image, $msg, ['chat_id' => $chatId, 'parse_mode' => 'HTML'], $keyboard);
+      return;
+    }
+
+    $telegram->sendMessage($msg, $chatId, ["reply_to_message_id" => $replyTo, "parse_mode" => "HTML"], $keyboard);
   }
 }

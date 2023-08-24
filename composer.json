@@ -6,7 +6,8 @@
     "psr-4": {
         "Telegram\\": "src/Telegram",
         "Services\\": "src/Services",
-        "Bot\\": "src/Bot"
+        "Bot\\": "src/Bot",
+        "Utils\\": "src/Utils"
     }
   },
   "authors": [

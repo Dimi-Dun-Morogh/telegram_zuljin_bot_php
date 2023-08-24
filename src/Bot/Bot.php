@@ -3,8 +3,7 @@
 namespace Bot;
 
 use Telegram\Telegram;
-
-
+use Utils\Utils;
 
 class Bot
 {
@@ -24,7 +23,9 @@ class Bot
     if ($update && $update['message']){
       $command = $this->getCommand($update);
     }else if ($update && $update['callback_query']){
-      $command = $update['callback_query']['data'];
+      // extract param
+
+      $command = explode(':', $update['callback_query']['data'])[0];
     };
 
 
@@ -57,6 +58,7 @@ class Bot
   private function invokeCb(string $command, mixed $update)
   {
     if ($this->callbacks[$command]) {
+
       [$className, $methodName] = $this->callbacks[$command];
 
 

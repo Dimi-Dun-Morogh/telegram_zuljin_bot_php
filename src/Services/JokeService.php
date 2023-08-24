@@ -45,7 +45,7 @@ class JokeService
 
     $replyTo = $callBackQueryId? null :  $update['message']['message_id'];
     $chatId = $update['message']['chat']['id'];
-    $userString = "Анекдот для " . "<a href='tg://user?id={$from['id']}'>{$from['first_name']}</a>"  . '%0A' . '%0A';
+    $userString = "Анекдот для " . "<a href='tg://user?id={$from['id']}'>{$from['first_name']}</a>"  . "\r\n" . "\r\n";
    // $userString = "";
     $keyboard = [
       "inline_keyboard" => [
