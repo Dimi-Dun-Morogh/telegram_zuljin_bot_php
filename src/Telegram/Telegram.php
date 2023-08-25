@@ -54,7 +54,7 @@ class Telegram
 
   private function cGet(string $url)
   {
-    Utils::writeLog('log.txt', $url);
+    Utils::writeLog('log.txt', 'cGEt'. "\r\n" . $url);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -65,6 +65,8 @@ class Telegram
       $message = $error['message'];
       Utils::writeLog('logerror.txt', $message);
     }
+
+    Utils::writeLog('apiLog.json', 'here' . $res);
     return $res;
   }
 
@@ -77,7 +79,7 @@ class Telegram
       . http_build_query($params);
 
     if (!empty($keyboard)) {
-      $keyboard = json_encode($keyboard);
+      $keyboard = urlencode(json_encode($keyboard));
       $url = $url . "&reply_markup=$keyboard";
     }
 
@@ -132,7 +134,7 @@ class Telegram
       . "&text=" .  rawurlencode($text);
 
     if (!empty($keyboard)) {
-      $keyboard = json_encode($keyboard);
+      $keyboard = urlencode(json_encode($keyboard));
 
       $url = $url . "&&reply_markup=$keyboard";
     }

@@ -11,10 +11,14 @@ use Utils\Utils;
 class VkGroupService
 {
 
+  public function __construct(private string $groupId, private string $keyname)
+  {
+  }
+
   public function getWallPost(int|string $offset = 1)
   {
     $apiKey = $_ENV['VK_API_KEY'];
-    $groupId = $_ENV['VK_GRP'];
+    $groupId = $this->groupId;
     $query = http_build_query([
       'access_token' => $apiKey, 'owner_id' => $groupId, 'offset' => $offset, 'count' => 1,
       'extended' => true, 'v' => '5.131'
@@ -53,7 +57,7 @@ class VkGroupService
       . "<i>" . $authorString . "  " . $date_string . "</i>" . "\r\n"  . "\r\n"
       . "comments: " . $comments . " " . "likes: " . $likes .  "\r\n";
 
-    return  [$msg,$postImage];
+    return  [$msg, $postImage];
   }
 
   public function getPostHandler(mixed $update, Telegram $telegram)
@@ -72,7 +76,7 @@ class VkGroupService
 
       $telegram->editMessageText($whoPressed . "Just a second 'Mon, da Zul be working on dat task right now", [
         'chat_id' => $update['message']['chat']['id'],
-         'message_id' => $update['message']['message_id'],
+        'message_id' => $update['message']['message_id'],
         'parse_mode' => 'HTML',
       ]);
 
@@ -84,20 +88,23 @@ class VkGroupService
 
     $chatId = $update['message']['chat']['id'];
     $nextOffset = $Offset + 1;
+    $prevOffset = $Offset == 1? 1 : $Offset - 1;
+    $keyname = $this->keyname;
+
     $keyboard = ['inline_keyboard' => [
       [
-        ['text' => 'следующий', "callback_data" => "vk_next_post:$nextOffset"]
-      ]
+        ['text' => '◀️назад', "callback_data" => "$keyname:$prevOffset"], ['text' => $Offset, "callback_data" => 'null'],
+        ['text' => 'вперёд▶️', "callback_data" => "$keyname:$nextOffset"]
+      ], [['text' => 'в начало', "callback_data" => "$keyname:1"]]
     ]];
     [$msg, $image] = $this->getWallPost($Offset);
 
 
 
     if ($isCbQuery) {
-      //  if new post has image  send new msg else edit old one
       if ($image) {
         $imageLink = "<a href='$image'>^_^</>";
-       $msg = "$imageLink \r\n".  $msg;
+        $msg = "$imageLink \r\n" .  $msg;
       }
       $telegram->editMessageText($msg, [
         'chat_id' => $chatId, 'message_id' => $update['message']['message_id'],
@@ -110,7 +117,7 @@ class VkGroupService
 
     if ($image) {
       $imageLink = "<a href='$image'>^_^</>";
-      $telegram->sendMessage("$imageLink \r\n".  $msg, $chatId, ["reply_to_message_id" => $replyTo, "parse_mode" => "HTML"], $keyboard);
+      $telegram->sendMessage("$imageLink \r\n" .  $msg, $chatId, ["reply_to_message_id" => $replyTo, "parse_mode" => "HTML"], $keyboard);
 
       return;
     }
