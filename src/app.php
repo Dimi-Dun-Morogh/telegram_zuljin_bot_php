@@ -11,6 +11,7 @@ use Utils\Utils;
 use Telegram\Telegram;
 
 
+
 Utils::writeLog('hook.json', file_get_contents('php://input'));
 
 $dotenv = Dotenv::createUnsafeImmutable(__DIR__ . "/../");
@@ -18,7 +19,7 @@ $dotenv->safeload();
 
 $key = getenv('TG_BOT_KEY');
 
-echo $key;
+
 
 $bot = new Bot(new  Telegram($key));
 
@@ -36,8 +37,10 @@ $bot->start();
 
 $setWebHook  = function () {
   global $bot;
+  $appMode = getenv('APP_MODE');
+  $webHookUrl = getenv('WEBHOOK_URL') . $appMode === 'DEV' ? "/zuljin_bot/public/index.php"
+  : "/public/index.php";
 
-  $webHookUrl = getenv('WEBHOOK_URL') . "/zuljin_bot/public/index.php";
   $bot->telegram->setWebHook($webHookUrl);
   //  $bot->telegram->deleteWebHook();
 };
