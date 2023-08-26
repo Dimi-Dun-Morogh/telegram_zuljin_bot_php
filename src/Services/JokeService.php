@@ -11,7 +11,7 @@ class JokeService
 {
   private  function getJoke(): string
   {
-    sleep(3);
+
     $res = [];
     $url = "https://www.anekdot.ru/random/anekdot/";
 
@@ -39,6 +39,16 @@ class JokeService
       $callBackQueryId = $update['callback_query']['id'];
       $update = $update['callback_query'];
       $from = $update['from'];
+      $whoPressed = "<a href='tg://user?id={$from['id']}'>{$from['first_name']}</a> нажал на кнопку"
+      .  "\r\n" . "\r\n";;
+
+    $telegram->editMessageText($whoPressed . "Just a second 'Mon, da Zul be working on dat task right now", [
+      'chat_id' => $update['message']['chat']['id'],
+      'message_id' => $update['message']['message_id'],
+      'parse_mode' => 'HTML',
+    ]);
+
+    sleep(1);
     }else {
       $from = $update['message']["from"];
     }
