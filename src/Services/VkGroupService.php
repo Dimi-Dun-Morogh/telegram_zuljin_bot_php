@@ -17,7 +17,7 @@ class VkGroupService
 
   public function getWallPost(int|string $offset = 1)
   {
-    $apiKey = $_ENV['VK_API_KEY'];
+    $apiKey = getenv('VK_API_KEY');
     $groupId = $this->groupId;
     $query = http_build_query([
       'access_token' => $apiKey, 'owner_id' => $groupId, 'offset' => $offset, 'count' => 1,
