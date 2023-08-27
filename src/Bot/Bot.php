@@ -40,7 +40,14 @@ class Bot
     foreach ($infoKeys as $key) {
       if (array_key_exists($key, $message)) {
 
-        $command = $key === 'text' ? explode('@', mb_strtolower($message['text']))[0]   : $key;
+        if  ($key === 'text') {
+          $command = explode('@', mb_strtolower($message['text']))[0];
+          $command = explode(' ', $command)[0];
+        }
+        else {
+          $command = $key;
+        }
+
         break;
       }
     }

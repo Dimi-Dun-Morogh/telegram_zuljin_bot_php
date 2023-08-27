@@ -2,10 +2,10 @@
 
 namespace Services;
 
+use Telegram\Telegram;
 
-//https://vk.com/frexgames  getPostHandler можно будет переписать на парс посты этой группы на хеш #FREE
+//https://vk.com/frexgames 
 
 class FreeGamesService extends VkGroupService {
-
 
 }

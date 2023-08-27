@@ -11,7 +11,7 @@ use Utils\Utils;
 class VkGroupService
 {
 
-  public function __construct(private string $groupId, private string $keyname)
+  public function __construct(private string $groupId, protected string $keyname)
   {
   }
 
@@ -64,29 +64,30 @@ class VkGroupService
   {
     $replyTo = null;
     $Offset = 1;
-    $isCbQuery = false;
+    $isCbQuery = key_exists('callback_query', $update);
+    $message = $isCbQuery ? $update['callback_query']['message'] :
+    $update['message']
+    ;
+    $replyTo = $message['message_id'];
 
-    if (key_exists('callback_query', $update)) {
-      $isCbQuery = true;
+    if ($isCbQuery) {
       $Offset = explode(':', $update['callback_query']['data'])[1];
       $update = $update['callback_query'];
       $from = $update['from'];
+
       $whoPressed = "<a href='tg://user?id={$from['id']}'>{$from['first_name']}</a> нажал на кнопку"
         .  "\r\n" . "\r\n";;
 
       $telegram->editMessageText($whoPressed . "Just a second 'Mon, da Zul be working on dat task right now", [
-        'chat_id' => $update['message']['chat']['id'],
-        'message_id' => $update['message']['message_id'],
+        'chat_id' => $message['chat']['id'],
+        'message_id' => $message['message_id'],
         'parse_mode' => 'HTML',
       ]);
 
       sleep(1);
-    } else {
-      $replyTo = $update['message']['message_id'];
     }
 
-
-    $chatId = $update['message']['chat']['id'];
+    $chatId = $message['chat']['id'];
     $nextOffset = $Offset + 1;
     $prevOffset = $Offset == 1? 1 : $Offset - 1;
     $keyname = $this->keyname;
@@ -99,26 +100,14 @@ class VkGroupService
     ]];
     [$msg, $image] = $this->getWallPost($Offset);
 
-
+    $imageLink =  $image ? "<a href='$image'>^_^</> \r\n" : '';
+    $msg = $imageLink . $msg;
 
     if ($isCbQuery) {
-      if ($image) {
-        $imageLink = "<a href='$image'>^_^</>";
-        $msg = "$imageLink \r\n" .  $msg;
-      }
       $telegram->editMessageText($msg, [
-        'chat_id' => $chatId, 'message_id' => $update['message']['message_id'],
+        'chat_id' => $chatId, 'message_id' => $message['message_id'],
         'parse_mode' => 'HTML',
       ], $keyboard);
-
-      return;
-    }
-
-
-    if ($image) {
-      $imageLink = "<a href='$image'>^_^</>";
-      $telegram->sendMessage("$imageLink \r\n" .  $msg, $chatId, ["reply_to_message_id" => $replyTo, "parse_mode" => "HTML"], $keyboard);
-
       return;
     }
 
