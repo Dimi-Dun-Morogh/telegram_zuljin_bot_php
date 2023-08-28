@@ -42,7 +42,7 @@ class Bot
 
         if  ($key === 'text') {
           $command = explode('@', mb_strtolower($message['text']))[0];
-          $command = explode(' ', $command)[0];
+          $command = $this->callbacks[$command] ? $command : explode(' ', $command)[0];
         }
         else {
           $command = $key;
