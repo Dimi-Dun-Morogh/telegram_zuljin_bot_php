@@ -41,14 +41,14 @@ class Telegram
       $message = $error['message'];
       Utils::writeLog('logerror.txt', $message);
     }
-    var_dump($data);
+  //  var_dump($data);
 
     return $data;
   }
 
-  public function getUpdates()
+  public function getUpdates($params=[])
   {
-    $data = $this->api('getUpdates');
+    $data = $this->api('getUpdates', $params);
     return $data;
   }
 
@@ -56,14 +56,17 @@ class Telegram
   {
     Utils::writeLog('log.txt', 'cGEt'. "\r\n" . $url);
     $ch = curl_init();
+    curl_setopt($ch, CURLOPT_FAILONERROR, true);
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $res = curl_exec($ch);
+    $httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
     if (!$res) {
-      $error = error_get_last();
-      $message = $error['message'];
-      Utils::writeLog('logerror.txt', $message);
+
+
+      Utils::writeLog('logerror.txt', curl_error($ch));
+      echo 'Curl error: ' . curl_error($ch) . " " . $httpstatus;
     }
 
     Utils::writeLog('apiLog.json', 'here' . $res);

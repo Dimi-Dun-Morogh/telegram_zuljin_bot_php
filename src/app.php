@@ -37,7 +37,7 @@ $bot->addCallback(["погода"], [WeatherService::class, 'weatherHandler']);
 
 $bot->start();
 
-
+$bot->longPolling();
 
 $setWebHook  = function () {
   global $bot;
