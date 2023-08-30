@@ -11,11 +11,11 @@ use Utils\Utils;
 class VkGroupService
 {
 
-  public function __construct(private string $groupId, protected string $keyname)
+  public function __construct(private string $groupId, protected string $keyname, private string $filter = '', private bool $ignorePinned = false)
   {
   }
 
-  public function getWallPost(int|string $offset = 1)
+  public function getWallPost(int|string $offset = 0)
   {
     $apiKey = getenv('VK_API_KEY');
     $groupId = $this->groupId;
@@ -25,7 +25,7 @@ class VkGroupService
     ]);
     $baseUrl = "https://api.vk.com/method/wall.get?" . $query;
     $data = json_decode(file_get_contents($baseUrl), true);
-
+    Utils::writeLog('vkapiLog.json', $baseUrl);
     $groupName = $data['response']['groups'][0]['name'];
 
     $post = $data['response']['items'][0];
@@ -36,13 +36,13 @@ class VkGroupService
       }
     }
 
-    $postImage = '';
+    $postImage = [];
 
     foreach ($post['attachments'] as $attachment) {
       if ($attachment['type'] === 'photo') {
         $photo = end($attachment['photo']['sizes']);
-        $postImage = $photo['url'];
-        break;
+        array_push($postImage,  $photo['url']);
+
       }
     }
 
@@ -57,21 +57,23 @@ class VkGroupService
       . "<i>" . $authorString . "  " . $date_string . "</i>" . "\r\n"  . "\r\n"
       . "comments: " . $comments . " " . "likes: " . $likes .  "\r\n";
 
-    return  [$msg, $postImage];
+    return  [$msg, $postImage, $post['is_pinned']];
   }
 
   public function getPostHandler(mixed $update, Telegram $telegram)
   {
     $replyTo = null;
-    $Offset = 1;
+    $Offset = 0;
     $isCbQuery = key_exists('callback_query', $update);
     $message = $isCbQuery ? $update['callback_query']['message'] :
     $update['message']
     ;
     $replyTo = $message['message_id'];
+    $isForwardKey = true;
 
     if ($isCbQuery) {
       $Offset = explode(':', $update['callback_query']['data'])[1];
+      $isForwardKey =  explode(':', $update['callback_query']['data'])[2] === 'F';
       $update = $update['callback_query'];
       $from = $update['from'];
 
@@ -87,6 +89,26 @@ class VkGroupService
       sleep(1);
     }
 
+
+
+    $post = $this->getWallPost($Offset);
+    $filter = $this->filter;
+    $ignorePinned = $this->ignorePinned;
+
+    if($filter && !str_contains($post[0],  $filter) ||  $ignorePinned && $post[2]) {
+      $filterSuccess = false;
+      while(!$filterSuccess){
+        $Offset = $isForwardKey ? $Offset + 1  : $Offset - 1 ;
+        if($Offset < 0) {
+          $Offset = 0;
+          $isForwardKey = true;
+        }
+        $newPost = $this->getWallPost($Offset);
+        $post = $newPost;
+        $filterSuccess = str_contains($newPost[0],  $filter);
+      }
+    }
+
     $chatId = $message['chat']['id'];
     $nextOffset = $Offset + 1;
     $prevOffset = $Offset == 1? 1 : $Offset - 1;
@@ -94,13 +116,14 @@ class VkGroupService
 
     $keyboard = ['inline_keyboard' => [
       [
-        ['text' => '◀️назад', "callback_data" => "$keyname:$prevOffset"], ['text' => $Offset, "callback_data" => 'null'],
-        ['text' => 'вперёд▶️', "callback_data" => "$keyname:$nextOffset"]
+        ['text' => '◀️назад', "callback_data" => "$keyname:$prevOffset:B"],
+        ['text' => 'вперёд▶️', "callback_data" => "$keyname:$nextOffset:F"]
       ], [['text' => 'в начало', "callback_data" => "$keyname:1"]]
     ]];
-    [$msg, $image] = $this->getWallPost($Offset);
 
-    $imageLink =  $image ? "<a href='$image'>^_^</> \r\n" : '';
+    [$msg, $image] = $post;
+
+    $imageLink =  $image[0] ? "<a href='$image[0]'>^_^</> \r\n" : '';
     $msg = $imageLink . $msg;
 
     if ($isCbQuery) {

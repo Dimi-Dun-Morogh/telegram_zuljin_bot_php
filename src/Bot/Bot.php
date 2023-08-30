@@ -2,6 +2,7 @@
 
 namespace Bot;
 
+use Handlers\Handlers;
 use Telegram\Telegram;
 use Utils\Utils;
 
@@ -11,7 +12,7 @@ class Bot
 
   private $services = [];
 
-  public function __construct(public Telegram $telegram)
+  public function __construct(public Telegram $telegram, private Handlers $handlers)
   {
   }
 
@@ -58,7 +59,7 @@ class Bot
     return $command;
   }
 
-  public function addCallback(string|array $onText, array $handler)
+  public function addCallback(string|array $onText, string $handler)
   {
     $onText =  is_array($onText) ? $onText : [$onText];
     foreach ($onText  as $command) {
@@ -69,10 +70,9 @@ class Bot
   {
     if ($this->callbacks[$command]) {
 
-      [$className, $methodName] = $this->callbacks[$command];
+      $fn = $this->callbacks[$command];
 
-
-      $this->services[$className]->$methodName($update, $this->telegram);
+      $this->handlers->$fn($update, $this->telegram);
     }
   }
   public function initServices(array $services)
