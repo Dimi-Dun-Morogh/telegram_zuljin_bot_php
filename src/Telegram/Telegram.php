@@ -144,13 +144,21 @@ class Telegram
 
     $this->cGet($url);
   }
+/**
+ * https://core.telegram.org/bots/api#sendmediagroup
+ */
+  public function sendMediaGroup(array  $params){
+
+    $url = $this->baseUrl  . "/sendMediaGroup?" . http_build_query($params);
+    $this->cGet($url);
+  }
 
   /**
    * https://core.telegram.org/bots/api#inputmedia
    */
-  public function editMessageMedia(array $params, array $media,  array $keyboard = [])
+  public function editMessageMedia(array $params, array $keyboard = [])
   {
-    $url = $this->baseUrl . "/editMessageMedia?" . http_build_query($params) . "&media=" . json_encode($media);
+    $url = $this->baseUrl . "/editMessageMedia?" . http_build_query($params);
     if (!empty($keyboard)) {
       $keyboard = json_encode($keyboard);
 

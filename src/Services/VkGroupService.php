@@ -42,7 +42,6 @@ class VkGroupService
       if ($attachment['type'] === 'photo') {
         $photo = end($attachment['photo']['sizes']);
         array_push($postImage,  $photo['url']);
-
       }
     }
 
@@ -57,7 +56,7 @@ class VkGroupService
       . "<i>" . $authorString . "  " . $date_string . "</i>" . "\r\n"  . "\r\n"
       . "comments: " . $comments . " " . "likes: " . $likes .  "\r\n";
 
-    return  [$msg, $postImage, $post['is_pinned']];
+    return  [$msg, $postImage, $post['is_pinned'], $groupName];
   }
 
   public function getPostHandler(mixed $update, Telegram $telegram)
@@ -66,8 +65,7 @@ class VkGroupService
     $Offset = 0;
     $isCbQuery = key_exists('callback_query', $update);
     $message = $isCbQuery ? $update['callback_query']['message'] :
-    $update['message']
-    ;
+      $update['message'];
     $replyTo = $message['message_id'];
     $isForwardKey = true;
 
@@ -95,11 +93,11 @@ class VkGroupService
     $filter = $this->filter;
     $ignorePinned = $this->ignorePinned;
 
-    if($filter && !str_contains($post[0],  $filter) ||  $ignorePinned && $post[2]) {
+    if ($filter && !str_contains($post[0],  $filter) ||  $ignorePinned && $post[2]) {
       $filterSuccess = false;
-      while(!$filterSuccess){
-        $Offset = $isForwardKey ? $Offset + 1  : $Offset - 1 ;
-        if($Offset < 0) {
+      while (!$filterSuccess) {
+        $Offset = $isForwardKey ? $Offset + 1  : $Offset - 1;
+        if ($Offset < 0) {
           $Offset = 0;
           $isForwardKey = true;
         }
@@ -111,7 +109,7 @@ class VkGroupService
 
     $chatId = $message['chat']['id'];
     $nextOffset = $Offset + 1;
-    $prevOffset = $Offset == 1? 1 : $Offset - 1;
+    $prevOffset = $Offset == 1 ? 1 : $Offset - 1;
     $keyname = $this->keyname;
 
     $keyboard = ['inline_keyboard' => [
@@ -127,6 +125,12 @@ class VkGroupService
     $msg = $imageLink . $msg;
 
     if ($isCbQuery) {
+
+      if (count($image) > 1) {
+        $this->sendImagesGroup($update, $telegram, $image, $keyboard, $post[3]);
+        return;
+      }
+
       $telegram->editMessageText($msg, [
         'chat_id' => $chatId, 'message_id' => $message['message_id'],
         'parse_mode' => 'HTML',
@@ -134,6 +138,28 @@ class VkGroupService
       return;
     }
 
+    if (count($image) > 1) {
+      $this->sendImagesGroup($update, $telegram, $image, $keyboard, $post[3]);
+      return;
+    }
+
     $telegram->sendMessage($msg, $chatId, ["reply_to_message_id" => $replyTo, "parse_mode" => "HTML"], $keyboard);
+  }
+
+  public function sendImagesGroup(mixed $update, Telegram $telegram, array $images, array $keyboard = [], string $groupName)
+  {
+    $chatId = $update['message']['chat']['id'];
+    $mediaArray = [];
+
+    foreach ($images as $image) {
+      $res = ['type' => 'photo', 'media' =>  $image];
+      array_push($mediaArray, $res);
+    }
+
+    $params = ['chat_id' => $chatId, 'media' => json_encode($mediaArray)];
+    $telegram->sendMediaGroup($params);
+    if (count($keyboard)) {
+      $telegram->sendMessage($groupName, $chatId, ["parse_mode" => "HTML"], $keyboard);
+    }
   }
 }
