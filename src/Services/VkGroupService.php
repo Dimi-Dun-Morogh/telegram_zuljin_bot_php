@@ -156,9 +156,9 @@ class VkGroupService
       array_push($mediaArray, $res);
     }
 
-    $mediaArray[0]['caption']  = mb_convert_encoding(substr( $msg, 0, 999), 'UTF-8') ;
+    // $mediaArray[0]['caption']  = mb_convert_encoding(substr( $msg, 0, 499), 'UTF-8') ;
 
-    $mediaArray[0]['parse_mode']  = 'HTML';
+    // $mediaArray[0]['parse_mode']  = 'HTML';
 
 
 
@@ -166,10 +166,10 @@ class VkGroupService
     $telegram->sendMediaGroup($params);
     if (count($keyboard)) {
 
-      $secondMsg = strlen($msg) > 999  ? mb_convert_encoding(substr( $msg,  999), 'UTF-8')
-      : $groupName;
+      // $secondMsg = strlen($msg) > 499  ? mb_convert_encoding(substr( $msg,  499), 'UTF-8')
+      // : $groupName;
 
-      $telegram->sendMessage($secondMsg, $chatId, ["parse_mode" => "HTML"], $keyboard);
+      $telegram->sendMessage($msg, $chatId, ["parse_mode" => "HTML"], $keyboard);
     }
   }
 }

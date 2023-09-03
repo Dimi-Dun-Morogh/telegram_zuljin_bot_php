@@ -24,15 +24,15 @@ $bot->addCallback(["анекдот", "зул анекдот"], 'jokesHandler');
 $bot->addCallback(["зул вк", 'vk_next_post'], 'sfPostHandler');
 $bot->addCallback(["зул игры", 'vk_next_game'],'gamesPostHandler');
 $bot->addCallback(["зул нюдсы", 'lrg_next_post'],'lrgPostHandler');
-$bot->addCallback(["help", "/help"], 'helpHandler');
+$bot->addCallback(["help", "/help", "/start", "start"], 'helpHandler');
 $bot->addCallback(["погода"],'weatherHandler');
 
 
 $bot->start();
 
-if (getenv('APP_MODE') === 'DEV') {
-  $bot->longPolling();
-}
+// if (getenv('APP_MODE') === 'DEV') {
+//   $bot->longPolling();
+// }
 
 
 
