@@ -65,8 +65,9 @@ class Telegram
     if (!$res) {
 
 
-      Utils::writeLog('logerror.txt', curl_error($ch));
+      Utils::writeLog('logerror.txt', curl_error($ch)  . "\n" . $url);
       echo 'Curl error: ' . curl_error($ch) . " " . $httpstatus;
+
     }
 
     Utils::writeLog('apiLog.json', 'here' . $res);

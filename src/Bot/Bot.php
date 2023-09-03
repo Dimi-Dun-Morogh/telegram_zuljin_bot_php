@@ -16,10 +16,12 @@ class Bot
   {
   }
 
-  private function proccesUpdate( mixed $update) {
+  private function proccesUpdate(mixed $update)
+  {
     $command = '';
     if (!$update) return;
-    if ($update && $update['message']) {
+
+    if (array_key_exists('message', $update)) {
       $command = $this->getCommand($update);
     } else if ($update && $update['callback_query']) {
       // extract param
@@ -93,8 +95,8 @@ class Bot
 
       $update = $this->telegram->getUpdates($params);
 
-      if($update && count($update['result'])) {
-        $lastUpdateId = $update['result'][0]['update_id'] +1;
+      if ($update && count($update['result'])) {
+        $lastUpdateId = $update['result'][0]['update_id'] + 1;
 
         $this->proccesUpdate($update['result'][0]);
 

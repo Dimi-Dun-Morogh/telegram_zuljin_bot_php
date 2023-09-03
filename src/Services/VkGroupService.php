@@ -11,7 +11,7 @@ use Utils\Utils;
 class VkGroupService
 {
 
-  public function __construct(private string $groupId, protected string $keyname, private string $filter = '', private bool $ignorePinned = false)
+  public function __construct(private string $groupId, protected string $keyname, private string $filter = '', private bool $ignorePinned = false, private bool $showAlbums = false)
   {
   }
 
@@ -56,7 +56,7 @@ class VkGroupService
       . "<i>" . $authorString . "  " . $date_string . "</i>" . "\r\n"  . "\r\n"
       . "comments: " . $comments . " " . "likes: " . $likes .  "\r\n";
 
-    return  [$msg, $postImage, $post['is_pinned'], $groupName];
+    return  [$msg, $postImage, array_key_exists('is_pinned', $post), $groupName];
   }
 
   public function getPostHandler(mixed $update, Telegram $telegram)
@@ -126,8 +126,8 @@ class VkGroupService
 
     if ($isCbQuery) {
 
-      if (count($image) > 1) {
-        $this->sendImagesGroup($update, $telegram, $image, $keyboard, $post[3]);
+      if ($this->showAlbums && count($image) > 1) {
+        $this->sendImagesGroup($update, $telegram, $image, $keyboard, $post[3], $post[0]);
         return;
       }
 
@@ -138,28 +138,38 @@ class VkGroupService
       return;
     }
 
-    if (count($image) > 1) {
-      $this->sendImagesGroup($update, $telegram, $image, $keyboard, $post[3]);
+    if ($this->showAlbums &&  count($image) > 1) {
+      $this->sendImagesGroup($update, $telegram, $image, $keyboard, $post[3], $post[0]);
       return;
     }
 
     $telegram->sendMessage($msg, $chatId, ["reply_to_message_id" => $replyTo, "parse_mode" => "HTML"], $keyboard);
   }
 
-  public function sendImagesGroup(mixed $update, Telegram $telegram, array $images, array $keyboard = [], string $groupName)
+  public function sendImagesGroup(mixed $update, Telegram $telegram, array $images, array $keyboard = [], string $groupName, string $msg =  '')
   {
     $chatId = $update['message']['chat']['id'];
     $mediaArray = [];
-
+    $msg =  strip_tags($msg);
     foreach ($images as $image) {
       $res = ['type' => 'photo', 'media' =>  $image];
       array_push($mediaArray, $res);
     }
 
+    $mediaArray[0]['caption']  = mb_convert_encoding(substr( $msg, 0, 999), 'UTF-8') ;
+
+    $mediaArray[0]['parse_mode']  = 'HTML';
+
+
+
     $params = ['chat_id' => $chatId, 'media' => json_encode($mediaArray)];
     $telegram->sendMediaGroup($params);
     if (count($keyboard)) {
-      $telegram->sendMessage($groupName, $chatId, ["parse_mode" => "HTML"], $keyboard);
+
+      $secondMsg = strlen($msg) > 999  ? mb_convert_encoding(substr( $msg,  999), 'UTF-8')
+      : $groupName;
+
+      $telegram->sendMessage($secondMsg, $chatId, ["parse_mode" => "HTML"], $keyboard);
     }
   }
 }

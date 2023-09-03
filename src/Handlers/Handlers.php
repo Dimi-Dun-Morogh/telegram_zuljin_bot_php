@@ -43,7 +43,7 @@ class  Handlers{
   }
   function lrgPostHandler(mixed $update, Telegram $telegram)
   {
-    $service = new VkGroupService('-142730744', 'lrg_next_post', '#от_подписчицы');
+    $service = new VkGroupService('-142730744', 'lrg_next_post', '#от_подписчицы', showAlbums:true);
     $service->getPostHandler($update, $telegram);
   }
 }
