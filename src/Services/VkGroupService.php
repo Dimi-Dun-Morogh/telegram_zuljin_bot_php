@@ -165,10 +165,6 @@ class VkGroupService
     $params = ['chat_id' => $chatId, 'media' => json_encode($mediaArray)];
     $telegram->sendMediaGroup($params);
     if (count($keyboard)) {
-
-      // $secondMsg = strlen($msg) > 499  ? mb_convert_encoding(substr( $msg,  499), 'UTF-8')
-      // : $groupName;
-
       $telegram->sendMessage($msg, $chatId, ["parse_mode" => "HTML"], $keyboard);
     }
   }
