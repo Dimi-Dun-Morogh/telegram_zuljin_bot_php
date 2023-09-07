@@ -72,6 +72,7 @@ class WeatherService
 
   private function datexTimezone(int $time, int $zone)
   {
+    $zone=str_replace("-",'',$zone);
     $date = new DateTime("@$time");
     $date->setTimezone(new DateTimeZone('UTC'));
 

@@ -22,17 +22,21 @@ $bot = new Bot(new  Telegram($key), new Handlers);
 
 $bot->addCallback(["анекдот", "зул анекдот"], 'jokesHandler');
 $bot->addCallback(["зул вк", 'vk_next_post'], 'sfPostHandler');
-$bot->addCallback(["зул игры", 'vk_next_game'],'gamesPostHandler');
-$bot->addCallback(["зул нюдсы", 'lrg_next_post'],'lrgPostHandler');
+$bot->addCallback(["зул игры", 'vk_next_game'], 'gamesPostHandler');
+$bot->addCallback(["зул нюдсы", 'lrg_next_post'], 'lrgPostHandler');
 $bot->addCallback(["help", "/help", "/start", "start"], 'helpHandler');
-$bot->addCallback(["погода"],'weatherHandler');
+$bot->addCallback(["погода"], 'weatherHandler');
 
+try {
+  $bot->start();
 
-$bot->start();
+  if (getenv('APP_MODE') === 'DEV') {
+    $bot->longPolling();
+  }
+} catch (\Throwable $th) {
+  Utils::writeLog('error.txt',   $th->getMessage());
+}
 
-// if (getenv('APP_MODE') === 'DEV') {
-//   $bot->longPolling();
-// }
 
 
 
