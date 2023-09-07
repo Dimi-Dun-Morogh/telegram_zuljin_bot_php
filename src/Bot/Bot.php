@@ -70,7 +70,8 @@ class Bot
   }
   private function invokeCb(string $command, mixed $update)
   {
-    if ($this->callbacks[$command]) {
+
+    if (array_key_exists($command, $this->callbacks)) {
 
       $fn = $this->callbacks[$command];
 
@@ -99,8 +100,6 @@ class Bot
         $lastUpdateId = $update['result'][0]['update_id'] + 1;
 
         $this->proccesUpdate($update['result'][0]);
-
-        // $this->telegram->sendMessage("$lastUpdateId",$update['result'][0]['message']['chat']['id']);
       }
 
       Utils::writeLog('update.json', json_encode($update));

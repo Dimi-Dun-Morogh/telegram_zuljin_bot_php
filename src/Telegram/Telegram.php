@@ -60,13 +60,13 @@ class Telegram
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $res = curl_exec($ch);
-    $httpstatus = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
     curl_close($ch);
     if (!$res) {
 
 
       Utils::writeLog('logerror.txt', curl_error($ch)  . "\n" . $url);
-      echo 'Curl error: ' . curl_error($ch) . " " . $httpstatus;
+      echo 'Curl error: ' . curl_error($ch) . " " . "\n" . $url;
 
     }
 
