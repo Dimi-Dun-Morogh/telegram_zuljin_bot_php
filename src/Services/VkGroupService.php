@@ -76,7 +76,7 @@ class VkGroupService
     $postText =  $post['text'];
     $comments = $post['comments']['count'];
     $likes = $post['likes']['count'];
-
+    $postText = str_replace(['>', '~', '<'], '', $postText);
 
     $msg = $groupName . "\r\n"
       . "<b>" . $postText .  "</b>"  . "\r\n"  . "\r\n"

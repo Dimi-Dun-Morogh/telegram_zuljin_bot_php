@@ -32,7 +32,7 @@ try {
   $bot->start();
 
   if (getenv('APP_MODE') === 'DEV') {
-//    $bot->longPolling();
+   $bot->longPolling();
   }
 } catch (\Throwable $th) {
   Utils::writeLog('error.txt',   $th->getMessage());
