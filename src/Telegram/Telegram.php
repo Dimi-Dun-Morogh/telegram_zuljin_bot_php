@@ -41,12 +41,12 @@ class Telegram
       $message = $error['message'];
       Utils::writeLog('logerror.txt', $message);
     }
-  //  var_dump($data);
+    //  var_dump($data);
 
     return $data;
   }
 
-  public function getUpdates($params=[])
+  public function getUpdates($params = [])
   {
     $data = $this->api('getUpdates', $params);
     return $data;
@@ -54,7 +54,7 @@ class Telegram
 
   private function cGet(string $url)
   {
-    Utils::writeLog('log.txt', 'cGEt'. "\r\n" . $url);
+    Utils::writeLog('log.txt', 'cGEt' . "\r\n" . $url);
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_FAILONERROR, true);
     curl_setopt($ch, CURLOPT_URL, $url);
@@ -67,7 +67,6 @@ class Telegram
 
       Utils::writeLog('logerror.txt', curl_error($ch)  . "\n" . $url);
       echo 'Curl error: ' . curl_error($ch) . " " . "\n" . $url;
-
     }
 
     Utils::writeLog('apiLog.json', 'here' . $res);
@@ -76,11 +75,18 @@ class Telegram
 
   public function sendMessage(string $message, string|int $chatId, array $params = [], array $keyboard = [])
   {
-    $message = rawurlencode($message);
+    $splitText = $this->splitMessage($message);
 
-    $url =   $url = $this->baseUrl  . "/sendMessage?"  . "&chat_id=$chatId&parse_mode=HTML&text=$message&"
+    $url =   $url = $this->baseUrl  . "/sendMessage?"  . "&chat_id=$chatId&parse_mode=HTML&text=" . rawurlencode($splitText[0]) . "&"
 
       . http_build_query($params);
+
+    if (count($splitText) > 1) {
+      $this->cGet($url);
+      $url =   $url = $this->baseUrl  . "/sendMessage?"  . "&chat_id=$chatId&parse_mode=HTML&text=" . rawurlencode($splitText[1]) . "&"
+
+        . http_build_query($params);
+    }
 
     if (!empty($keyboard)) {
       $keyboard = urlencode(json_encode($keyboard));
@@ -119,7 +125,7 @@ class Telegram
 
   {
 
-   $captions = rawurlencode($captions);
+    $captions = rawurlencode($captions);
 
     $url  = $this->baseUrl  . "/sendPhoto?" . "&photo=" .  urlencode($imgUrl)
       . "&caption=" . $captions . "&" . http_build_query($params);
@@ -134,8 +140,16 @@ class Telegram
 
   public function editMessageText(string $text, array $params, array $keyboard = [])
   {
+    $splitText = $this->splitMessage($text);
     $url = $this->baseUrl . "/editMessageText?" . http_build_query($params)
-      . "&text=" .  rawurlencode($text);
+      . "&text=" .  rawurlencode($splitText[0]);
+
+    if (count($splitText) > 1) {
+      //send 1st message and change url;
+      $this->cGet($url);
+      $url = $this->baseUrl . "/sendMessage?" . http_build_query($params)
+        . "&text=" .  rawurlencode($splitText[1]);
+    }
 
     if (!empty($keyboard)) {
       $keyboard = urlencode(json_encode($keyboard));
@@ -145,10 +159,24 @@ class Telegram
 
     $this->cGet($url);
   }
-/**
- * https://core.telegram.org/bots/api#sendmediagroup
- */
-  public function sendMediaGroup(array  $params){
+  private function splitMessage(string $text)
+  {
+    $res = [];
+    $res[] = substr($text, 0, 3900);
+    if (strlen($text)  > 3900) {
+      // ! проблема с незакрытыми хтмл тегами
+      $text = strip_tags($text);
+      $res[0] =     substr($text, 0, 3900) . "\r\n" . "⬇️";
+      $res[1] =   "\r\n" . "⬆️"  . substr($text, 3900);
+    }
+    $res  = array_map(fn ($el) => mb_convert_encoding($el, "UTF-8"), $res);
+    return $res;
+  }
+  /**
+   * https://core.telegram.org/bots/api#sendmediagroup
+   */
+  public function sendMediaGroup(array  $params)
+  {
 
     $url = $this->baseUrl  . "/sendMediaGroup?" . http_build_query($params);
     $this->cGet($url);
@@ -168,8 +196,9 @@ class Telegram
     Utils::writeLog('log.txt', $url);
     $this->cGet($url);
   }
-  public function deleteMessage(string|int $chatId, string|int $messageId){
-    $url =$this->baseUrl . "/deleteMessage?chat_id=" .$chatId ."&message_id=" . $messageId;
+  public function deleteMessage(string|int $chatId, string|int $messageId)
+  {
+    $url = $this->baseUrl . "/deleteMessage?chat_id=" . $chatId . "&message_id=" . $messageId;
     $this->cGet($url);
   }
 }
