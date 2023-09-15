@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Services;
+namespace App\Services;
 
-use Telegram\Telegram;
-use Utils\Utils;
+use App\Telegram\Telegram;
+use App\Utils\Utils;
 
 
 class VkGroupService

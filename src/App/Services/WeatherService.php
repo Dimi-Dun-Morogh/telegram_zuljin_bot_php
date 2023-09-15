@@ -1,11 +1,11 @@
 <?php
 
-namespace Services;
+namespace App\Services;
 
 use DateInterval;
 use DateTime;
 use DateTimeZone;
-use Telegram\Telegram;
+use App\Telegram\Telegram;
 
 //http://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)}&lang=ru&cnt=8&units=metric&appid=${config.weatherApiKey}
 

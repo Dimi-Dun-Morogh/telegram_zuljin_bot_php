@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Handlers;
+namespace App\Handlers;
 
-use Services\CommonService;
-use Services\JokeService;
-use Services\VkGroupService;
-use Services\WeatherService;
-use Telegram\Telegram;
+use App\Services\CommonService;
+use App\Services\JokeService;
+use App\Services\VkGroupService;
+use App\Services\WeatherService;
+use App\Telegram\Telegram;
 
 
 class  Handlers

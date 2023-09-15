@@ -1,6 +1,6 @@
 <?php
 
-include __DIR__ . "/../src/views/admin.php";
+include __DIR__ . "/../src/App/views/admin.php";
 
 ?>
 

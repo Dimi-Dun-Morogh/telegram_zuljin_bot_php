@@ -1,8 +1,8 @@
 <?php
 
-namespace Services;
+namespace App\Services;
 
-use Telegram\Telegram;
+use App\Telegram\Telegram;
 
 class CommonService
 {

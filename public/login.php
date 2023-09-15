@@ -1,6 +1,6 @@
 <?php
 
-include __DIR__ . "/../src/views/login-admin.php";
+include __DIR__ . "/../src/App/views/login-admin.php";
 
 ?>
 

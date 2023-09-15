@@ -4,11 +4,8 @@
   "type": "project",
   "autoload": {
     "psr-4": {
-        "Telegram\\": "src/Telegram",
-        "Services\\": "src/Services",
-        "Bot\\": "src/Bot",
-        "Utils\\": "src/Utils",
-        "Handlers\\": "src/Handlers"
+        "App\\": "src/App",
+        "Config\\": "src/Config"
     }
   },
   "authors": [
