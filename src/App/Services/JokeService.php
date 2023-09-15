@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Services;
+namespace App\Services;
 
 use DOMDocument;
-use Telegram\Telegram;
+use App\Telegram\Telegram;
 
 class JokeService
 {

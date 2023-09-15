@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Utils;
+namespace App\Utils;
 
 //file_put_contents(__DIR__ . '../../../logs/log.json', $data);
 
 class Utils
 {
-  static string $baseLogPath = __DIR__ . '../../../logs/';
+  static string $baseLogPath = __DIR__ . '../../../../logs/';
 
 
   static function dirExists()

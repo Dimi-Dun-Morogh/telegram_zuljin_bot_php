@@ -1,10 +1,10 @@
 <?php
 
-namespace Bot;
+namespace App\Bot;
 
-use Handlers\Handlers;
-use Telegram\Telegram;
-use Utils\Utils;
+use App\Handlers\Handlers;
+use App\Telegram\Telegram;
+use App\Utils\Utils;
 
 class Bot
 {
@@ -24,7 +24,6 @@ class Bot
     if (array_key_exists('message', $update)) {
       $command = $this->getCommand($update);
     } else if ($update && $update['callback_query']) {
-      // extract param
 
       $command = explode(':', $update['callback_query']['data'])[0];
     };
@@ -88,8 +87,6 @@ class Bot
   public function longPolling()
   {
     $lastUpdateId = null;
-
-
 
     while (true) {
       $params = ['limit' => 1, 'offset' => $lastUpdateId];

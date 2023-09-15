@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Telegram;
+namespace App\Telegram;
 
 use Exception;
-use Utils\Utils;
+use App\Utils\Utils;
 
 class Telegram
 {

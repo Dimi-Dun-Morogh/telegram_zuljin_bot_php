@@ -1,5 +1,5 @@
 <?php
 
-[$hook, $d]  = require('../src/app.php') ;
+[$hook, $d]  = require('../src/App/app.php') ;
 
 $d();
