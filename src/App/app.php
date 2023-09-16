@@ -13,7 +13,6 @@ use App\Services\AdminService;
 
 $dbConfig = Config::dbConfig();
 
-
 $db = new Db('mysql', [
   'host' =>  $dbConfig['host'],
   'port' =>  $dbConfig['port'],

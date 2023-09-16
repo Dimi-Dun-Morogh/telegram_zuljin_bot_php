@@ -22,10 +22,10 @@ function dynamic() {
     case 'webhook':
       include __DIR__ . "/partials/webhook.php" ;
       break;
-
+    case 'main':
     default:
 
-      echo 'main';
+    include __DIR__ . "/partials/main.php" ;
       break;
   }
 }

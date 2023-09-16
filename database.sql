@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `admins`(
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `login` VARCHAR(64) NOT NULL,
   `password` VARCHAR(64) NOT NULL,
-  `telegram_id` BIGINT(30) NOT NULL,
+  `telegram_id` BIGINT(30) NULL,
    PRIMARY KEY (`id`),
     UNIQUE (login)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

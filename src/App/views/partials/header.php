@@ -11,4 +11,4 @@
 
 <body class="vh-100">
   <div class="container h-100 d-flex flex-column">
-    <header class="header-admin">header zul</header>
+    <header class="header-admin text-center">zuljin_bot</header>
