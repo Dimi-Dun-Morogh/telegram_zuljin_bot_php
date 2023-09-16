@@ -3,7 +3,7 @@
 
 
 <footer class="footer-admin text-center">
-  Dimi-Dun-Morogh 2023
+  Dimi-Dun-Morogh 2023  <i class="bi bi-github"></i>
 </footer>
 </div>
 </body>

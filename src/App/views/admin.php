@@ -1,6 +1,37 @@
 <?php include __DIR__ . "/partials/header.php" ?>
 <!-- end header -->
 
+<?php
+
+$app  = require(__DIR__ . "/../app.php");
+ $bot = $app['bot'];
+ $config = $app['config'];
+ function botName() {
+  global $bot;
+  $data = $bot->telegram->getMe();
+  if(isset($data['result'])) {
+    return $data['result']['username'];
+  }
+ }
+
+function dynamic() {
+  global $bot;
+  global $config;
+ $botName = botName();
+  switch (explode("=",$_SERVER['QUERY_STRING'])[0]) {
+    case 'webhook':
+      include __DIR__ . "/partials/webhook.php" ;
+      break;
+
+    default:
+
+      echo 'main';
+      break;
+  }
+}
+
+?>
+
 <div class="d-flex content my-1 flex-grow-1 ">
   <div class="col-2 admin-sidebar-wrap">
 
@@ -9,11 +40,39 @@
 
   </div>
   <div class="col admin-content">
-    <h3>hello content</h3>
-    <?php echo $_SERVER['QUERY_STRING']; ?>
+
+    <?php dynamic(); ?>
   </div>
 
 </div>
 <!-- end of content container -->
 
 <?php include __DIR__ . "/partials/footer.php" ?>
+
+
+<?php
+
+function redirectLogin()
+{
+  $currentUrl = $_SERVER['REQUEST_URI'];
+  $parsedUrl = parse_url($currentUrl);
+  $cleanUrl = $parsedUrl['path'];
+  $newUrl = str_replace("admin", "login", $cleanUrl);
+
+  header("Location: $newUrl");
+  exit;
+}
+
+if ($_SERVER['QUERY_STRING'] === 'logout') {
+  session_destroy();
+  redirectLogin();
+}
+
+
+if (!isset($_SESSION['user'])) {
+
+  redirectLogin();
+}
+
+
+?>

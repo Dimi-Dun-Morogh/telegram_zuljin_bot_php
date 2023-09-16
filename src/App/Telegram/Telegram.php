@@ -108,6 +108,15 @@ class Telegram
     $this->api('deleteWebhook');
   }
 
+  public function WebhookInfo() {
+    return $this->api('getWebhookInfo?');
+  }
+
+  public function getMe()
+  {
+    return $this->api('getMe?');
+  }
+
   public function getWebhookUpdate()
   {
     file_put_contents(__DIR__ . '../../../log.json', file_get_contents('php://input'));

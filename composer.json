@@ -8,6 +8,9 @@
         "Config\\": "src/Config"
     }
   },
+  "scripts": {
+    "initdb": "php src/App/Db/initDb.php"
+},
   "authors": [
     {
       "name": "Dimi-Dun-Morogh",

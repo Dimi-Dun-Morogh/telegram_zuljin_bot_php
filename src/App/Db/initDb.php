@@ -14,7 +14,7 @@ $db = new Db('mysql', [
   'dbname' => $dbConfig['dbname']
 ], $dbConfig['user'], $dbConfig['pass']);
 
-$sqlFile = file_get_contents("../../../database.sql");
+$sqlFile = file_get_contents(__DIR__ . "/../../../database.sql");
 
 $db->connection->query($sqlFile);
 //create admin default acc;

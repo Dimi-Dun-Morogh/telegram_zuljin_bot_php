@@ -8,9 +8,19 @@ use App\Handlers\Handlers;
 use App\Utils\Utils;
 use Config\Config;
 use App\Telegram\Telegram;
+use App\Db\Db;
+use App\Services\AdminService;
+
+$dbConfig = Config::dbConfig();
 
 
+$db = new Db('mysql', [
+  'host' =>  $dbConfig['host'],
+  'port' =>  $dbConfig['port'],
+  'dbname' => $dbConfig['dbname']
+], $dbConfig['user'], $dbConfig['pass']);
 
+$admin = new AdminService($db);
 
 Utils::writeLog('hook.json', file_get_contents('php://input'));
 
@@ -29,25 +39,11 @@ try {
 
   if (Config::AppMode() === 'DEV') {
 
-    $bot->longPolling();
+    // $bot->longPolling();
   }
 } catch (\Throwable $th) {
   Utils::writeLog('error.txt',   $th->getMessage());
 }
 
 
-
-
-$setWebHook  = function () {
-  global $bot;
-  $webHookUrl = Config::WebhookUrl();
-  $bot->telegram->setWebHook($webHookUrl);
-};
-
-$deleteWebHook = function () {
-  global $bot;
-  $bot->telegram->deleteWebHook();
-};
-
-
-return [$setWebHook, $deleteWebHook];
+return ['admin'=>$admin, 'bot'=>$bot, 'config'=>['WebHook'=>Config::WebhookUrl(), 'botkey'=>Config::BotKey()]];

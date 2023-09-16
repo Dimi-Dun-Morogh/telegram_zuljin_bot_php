@@ -20,10 +20,21 @@ class AdminService
     VALUES (:login, :password)
      ", ['login' => $login, 'password' => $password]);
 
+    session_regenerate_id();
+    $_SESSION['user'] = $this->db->id();
+  }
 
-    // session_regenerate_id();
+  public function login(array $formData)
+  {
+    $user = $this->db->query("SELECT * FROM admins WHERE login = :login", [
+      'login' => $formData['login']
+    ])->find();
 
-
-    // $_SESSION['user'] = $this->db->id();
+    $passwordsMatch = password_verify($formData['password'], $user['password'] ?? '');
+    if (!$user || !$passwordsMatch) {
+      return;
+    }
+    session_regenerate_id();
+    $_SESSION['user'] = $user['id'];
   }
 }
