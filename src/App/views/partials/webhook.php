@@ -33,11 +33,12 @@ if (isset(explode("=", $_SERVER['QUERY_STRING'])[1])) {
 
 <div class="container d-flex flex-column align-items-center align-content-center h-100">
   <h3 class="text-center">Webhook Settings for <?php echo $botName ?></h3>
+
   <h5 class="mt-5 align-self-start"> <b>[env var webhook]:</b> <?php echo $config['WebHook']  ?> </h5>
   <h5 class="mt-5 align-self-start "><b>[current webhook]:</b> <?php echo currentHook()  ?> </h5>
   <div class="col-5">
 
-    <div class="btn-group d-flex flex-column mt-5">
+    <div class="d-flex flex-column mt-5">
       <a href="admin.php?webhook=set" class="btn btn-success mb-3 fw-bold">
         <i class="bi bi-gear-fill"></i> SET Webhook
       </a>

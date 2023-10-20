@@ -53,3 +53,9 @@ background-color: #66ba33;
   border-radius: 3%;
   border: 1px solid #969696 !important;
 }
+
+@media (max-width: 1000px) {
+  .admin-content {
+    margin-left: 0 !important;
+  }
+}

@@ -32,14 +32,16 @@ function dynamic() {
 
 ?>
 
-<div class="d-flex content my-1 flex-grow-1 ">
-  <div class="col-2 admin-sidebar-wrap">
+<div class="d-flex flex-column flex-md-row flex-grow-1">
+
+  <div class="admin-sidebar-wrap">
 
     <!-- Sidebar -->
     <?php include __DIR__ . "/partials/sidebar.php" ?>
 
   </div>
-  <div class="col admin-content">
+
+  <div class="col admin-content ">
 
     <?php dynamic(); ?>
   </div>

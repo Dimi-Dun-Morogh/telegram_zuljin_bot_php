@@ -16,10 +16,11 @@ function activeLink(string $name)
 
 <nav class="navbar navbar-expand-lg admin-sidebar-nav mt-4" data-bs-theme="dark">
 
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+  <button class="navbar-toggler" type="button"
+  data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNavs" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <div class="collapse navbar-collapse " id="navbarNav">
+  <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav flex-column  text-center w-100">
       <li class="nav-item <?php activeLink('main')?>">
         <a class="nav-link <?php activeLink('main')?>" href="admin.php?main"><i class="bi bi-info-square-fill"></i>  BOT INFO</a>

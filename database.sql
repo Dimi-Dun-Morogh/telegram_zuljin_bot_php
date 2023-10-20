@@ -24,6 +24,10 @@ CREATE TABLE IF NOT EXISTS `chat_participants`(
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `chat_id` BIGINT(30) NOT NULL,
   `user_id` BIGINT(30) NOT NULL,
+  `username` VARCHAR(40),
+  `first_name` VARCHAR(40),
+  `last_name` VARCHAR(40),
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
    PRIMARY KEY (`id`),
    FOREIGN KEY(chat_id) REFERENCES chats(chat_id)
 )  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

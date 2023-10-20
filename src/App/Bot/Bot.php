@@ -23,7 +23,7 @@ class Bot
 
     if (array_key_exists('message', $update)) {
       $command = $this->getCommand($update);
-    } else if ($update && $update['callback_query']) {
+    } else if ($update['callback_query']) {
 
       $command = explode(':', $update['callback_query']['data'])[0];
     };
@@ -48,6 +48,7 @@ class Bot
 
         if ($key === 'text') {
           $command = explode('@', mb_strtolower($message['text']))[0];
+
           $command = $this->callbacks[$command] ? $command : explode(' ', $command)[0];
         } else {
           $command = $key;
@@ -56,7 +57,6 @@ class Bot
         break;
       }
     }
-
     return $command;
   }
 
@@ -71,7 +71,7 @@ class Bot
   {
 
     if (array_key_exists($command, $this->callbacks)) {
-
+      $this->onEachMessage($update, $this->telegram);
       $fn = $this->callbacks[$command];
 
       $this->handlers->$fn($update, $this->telegram);
@@ -103,4 +103,13 @@ class Bot
       sleep(2);
     }
   }
+
+  // this to force check of db creation or some other esential fn to run on each interraction
+  private function onEachMessage(mixed $update, Telegram $telegram){
+    $cb = $this->callbacks['onEachMessage'];
+    if($cb) {
+      $this->handlers->$cb($update, $telegram);
+    }
+  }
+
 }
