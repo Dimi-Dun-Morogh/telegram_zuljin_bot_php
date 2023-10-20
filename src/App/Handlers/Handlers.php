@@ -116,6 +116,8 @@ class  Handlers
 
   function forceDbCreationHandler(mixed $update, Telegram $telegram)
   {
+    if(key_exists('callback_query', $update)) return;
+
     $service = new ChatService($this->db);
     $service->createChat($update, $telegram);
   }
