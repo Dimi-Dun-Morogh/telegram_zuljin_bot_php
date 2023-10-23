@@ -22,6 +22,9 @@ class Bot
     if (!$update) return;
 
     if (array_key_exists('message', $update)) {
+
+      $this->onEachMessage($update, $this->telegram);
+
       $command = $this->getCommand($update);
     } else if ($update['callback_query']) {
 
@@ -71,7 +74,7 @@ class Bot
   {
 
     if (array_key_exists($command, $this->callbacks)) {
-      $this->onEachMessage($update, $this->telegram);
+
       $fn = $this->callbacks[$command];
 
       $this->handlers->$fn($update, $this->telegram);
@@ -105,11 +108,11 @@ class Bot
   }
 
   // this to force check of db creation or some other esential fn to run on each interraction
-  private function onEachMessage(mixed $update, Telegram $telegram){
+  private function onEachMessage(mixed $update, Telegram $telegram)
+  {
     $cb = $this->callbacks['onEachMessage'];
-    if($cb) {
+    if ($cb) {
       $this->handlers->$cb($update, $telegram);
     }
   }
-
 }

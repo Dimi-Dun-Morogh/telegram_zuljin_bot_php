@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS `chat_participants`(
   `username` VARCHAR(40),
   `first_name` VARCHAR(40),
   `last_name` VARCHAR(40),
+  `msg_count` BIGINT DEFAULT 0,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
    PRIMARY KEY (`id`),
    FOREIGN KEY(chat_id) REFERENCES chats(chat_id)

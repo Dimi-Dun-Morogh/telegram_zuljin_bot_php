@@ -114,11 +114,20 @@ class  Handlers
     $service->onChatLeave($update, $telegram);
   }
 
-  function forceDbCreationHandler(mixed $update, Telegram $telegram)
-  {
+
+  function onEachMessageHandler(mixed $update, Telegram $telegram){
     if(key_exists('callback_query', $update)) return;
 
     $service = new ChatService($this->db);
+    //!creat db is there is not any
     $service->createChat($update, $telegram);
+    $service->createChatUser($update);
+
+    $service->updMsgCount($update);
+  }
+
+  function msgStatHandler(mixed $update, Telegram $telegram) {
+    $service = new ChatService($this->db);
+    $service->msgStat($update, $telegram);
   }
 }

@@ -36,7 +36,9 @@ $bot->addCallback(["/greet_add"], "updateGreetHandler");
 $bot->addCallback(["/leave_add"], "updateLeaveHandler");
 $bot->addCallback(['new_chat_participant'], "onChatEnterHandler");
 $bot->addCallback(['left_chat_member'], "onChatLeaveHandler");
-$bot->addCallback('onEachMessage', 'forceDbCreationHandler');
+$bot->addCallback(['зул стата'], "msgStatHandler");
+
+$bot->addCallback('onEachMessage', 'onEachMessageHandler');
 
 
 

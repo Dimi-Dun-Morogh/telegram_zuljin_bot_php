@@ -54,10 +54,11 @@ class ChatService
     return $response;
   }
 
-  public function showRules(mixed $update, Telegram $telegram) {
+  public function showRules(mixed $update, Telegram $telegram)
+  {
     $chat =  $update['message']['chat'];
     $rules = $this->getChat($chat['id']);
-    if(!$rules['rules']) return;
+    if (!$rules['rules']) return;
     $telegram->sendMessage($rules['rules'], $chat['id']);
   }
 
@@ -111,5 +112,68 @@ class ChatService
     if (!$chatData || !$chatData['leave_message']) return;
     $messsage = "{$profile['first_name']} {$chatData['leave_message']}";
     $telegram->sendMessage($messsage, $chat['id']);
+  }
+
+  public function createChatUser(mixed $update)
+  {
+    $chat =  $update['message']['chat'];
+    $profile = $update['message']['from'];
+    if ($profile['is_bot']) return;
+
+    $query = "SELECT * from chat_participants WHERE chat_id={$chat['id']} AND user_id={$profile['id']}";
+    $data = $this->db->query($query)->find();
+
+    if (!$data) {
+      $query = "INSERT INTO chat_participants (chat_id, user_id, username, first_name, last_name) VALUES (:chat_id, :user_id, :username, :first_name, :last_name)";
+      $this->db->query($query, [
+        'chat_id' => $chat['id'],
+        'user_id' => $profile['id'],
+        'username' => $profile['username'],
+        'first_name' => $profile['first_name'],
+        'last_name' => $profile['last_name'] ?? ''
+      ]);
+    }
+  }
+
+  public function updMsgCount($update)
+  {
+    $chat =  $update['message']['chat'];
+    $profile = $update['message']['from'];
+    if ($profile['is_bot']) return;
+    $user = $this->db->query("SELECT * FROM chat_participants WHERE user_id={$profile['id']}
+    AND chat_id={$chat['id']}")->find();
+    if (!$user) return;
+    $query = "UPDATE chat_participants
+    SET msg_count=msg_count+1
+    WHERE user_id={$profile['id']}
+    AND chat_id={$chat['id']}";
+    $this->db->query($query);
+  }
+
+  public function msgStat(mixed $update, Telegram $telegram)
+  {
+    $chat =  $update['message']['chat'];
+    $query = "SELECT * FROM chat_participants WHERE chat_id={$chat['id']}
+    ORDER BY msg_count DESC
+    LIMIT 20
+    ";
+    $data = $this->db->query($query)->findAll();
+    // var_dump($data);
+    $msg = $this->renderMsgStat($data);
+    $telegram->sendMessage($msg, $chat['id'], ['parse_mode' => 'HTML']);
+  }
+
+  private  function renderMsgStat(mixed $data) {
+    $res =  '';
+    $total = 0;
+    foreach($data as $user) {
+      $id = $user['user_id'];
+      $name = $user['first_name'];
+      $userLink = "✅  <b><a href='tg://user?id={$id}'>{$name}</a></b>" ;
+      $res .= "{$userLink} - {$user['msg_count']} " . "\r\n";
+      $total += $user['msg_count'];
+    }
+
+    return "👀Всего сообщений:  {$total} \r\n \r\n{$res}";
   }
 }

@@ -42,6 +42,7 @@ class Db
     return $this->stmt->fetchColumn();
   }
 
+
   public function find()
   {
     return $this->stmt->fetch();
