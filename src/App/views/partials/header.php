@@ -10,5 +10,5 @@
 </head>
 
 <body class="vh-100">
-  <div class="container h-100 d-flex flex-column">
+  <div class="container h-100 d-flex flex-column app-container">
     <header class="header-admin text-center">zuljin_bot</header>

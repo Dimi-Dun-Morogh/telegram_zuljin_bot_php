@@ -6,6 +6,7 @@
 $app  = require(__DIR__ . "/../app.php");
  $bot = $app['bot'];
  $config = $app['config'];
+ $admin = $app['admin'];
  function botName() {
   global $bot;
   $data = $bot->telegram->getMe();
@@ -17,10 +18,14 @@ $app  = require(__DIR__ . "/../app.php");
 function dynamic() {
   global $bot;
   global $config;
+  global $admin;
  $botName = botName();
   switch (explode("=",$_SERVER['QUERY_STRING'])[0]) {
     case 'webhook':
       include __DIR__ . "/partials/webhook.php" ;
+      break;
+    case 'changepw':
+      include __DIR__ . "/partials/changepw.php" ;
       break;
     case 'main':
     default:

@@ -31,7 +31,7 @@ if (isset(explode("=", $_SERVER['QUERY_STRING'])[1])) {
 
 ?>
 
-<div class="container d-flex flex-column align-items-center align-content-center h-100">
+<div class="container d-flex flex-column align-items-center align-content-center h-100 admin-block-bg">
   <h3 class="text-center">Webhook Settings for <?php echo $botName ?></h3>
 
   <h5 class="mt-5 align-self-start"> <b>[env var webhook]:</b> <?php echo $config['WebHook']  ?> </h5>

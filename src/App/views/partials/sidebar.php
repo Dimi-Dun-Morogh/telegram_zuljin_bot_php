@@ -37,6 +37,9 @@ function activeLink(string $name)
       <li class="nav-item ">
         <a class="nav-link" href="admin.php?logout"><i class="bi bi-box-arrow-right"></i>  LOGOUT</a>
       </li>
+      <li class="nav-item ">
+        <a class="nav-link" href="admin.php?changepw"><i class="bi bi-box-arrow-right"></i>  CHANGE PASSWORD</a>
+      </li>
     </ul>
   </div>
 </nav>
