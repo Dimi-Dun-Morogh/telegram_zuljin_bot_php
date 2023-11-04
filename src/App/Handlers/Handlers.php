@@ -11,7 +11,7 @@ use App\Services\VkGroupService;
 use App\Services\WeatherService;
 use App\Telegram\Telegram;
 use App\Db\Db;
-
+use App\Services\RandTvjService\RandTvjService;
 
 class  Handlers
 {
@@ -129,5 +129,11 @@ class  Handlers
   function msgStatHandler(mixed $update, Telegram $telegram) {
     $service = new ChatService($this->db);
     $service->msgStat($update, $telegram);
+  }
+
+  function tvjHandler(mixed $update, Telegram $telegram)
+  {
+    $service = new RandTvjService();
+    $service->handleRandomLine($update, $telegram);
   }
 }
