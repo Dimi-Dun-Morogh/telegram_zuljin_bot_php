@@ -48,7 +48,7 @@ try {
 
 	if (Config::AppMode() === 'DEV') {
 
-		  $bot->longPolling();
+		  // $bot->longPolling();
 	}
 } catch (\Throwable $th) {
 	Utils::writeLog('error.txt', $th->getMessage());

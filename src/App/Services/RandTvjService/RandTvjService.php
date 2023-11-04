@@ -3,29 +3,27 @@
 namespace App\Services\RandTvjService;
 
 use App\Telegram\Telegram;
-use PDO;
+use \SQLite3;
 
 class RandTvjService
 {
 
-  private $pdo;
+  private $db;
 
   public function __construct()
   {
-    $this->pdo = new PDO('sqlite:' . __DIR__ .  '/database.db');
+    $this->db = new SQLite3(__DIR__ . '/database.db');
   }
 
   public function randomLine()
   {
-    $totalSongs = $this->pdo->prepare('SELECT count(*) as total FROM songs');
-    $totalSongs->execute();
-    $totalSongs = $totalSongs->fetch();
+    $totalSongs = $this->db->query('SELECT count(*) as total FROM songs');
+    $totalSongs = $totalSongs->fetchArray(SQLITE3_ASSOC)['total'];
 
     $number = rand(1, $totalSongs['total']);
 
-    $song = $this->pdo->prepare("SELECT * FROM songs LIMIT $number,1");
-    $song->execute();
-    $song = $song->fetch();
+    $song = $this->db->query("SELECT * FROM songs LIMIT $number,1");
+    $song = $song->fetchArray(SQLITE3_ASSOC);
 
     $arrOfLines = explode('<br>', $song['text']);
 
