@@ -13,7 +13,6 @@ class RandTvjService
 
   public function __construct(private Db $db)
   {
-
   }
 
   public function randomLine()
@@ -29,17 +28,19 @@ class RandTvjService
     $arrOfLines = explode('<br>', $song['text']);
 
     $randomKey = array_rand($arrOfLines);
-    echo $arrOfLines[$randomKey]. "\n";
-    echo $arrOfLines[$randomKey-1]?? $arrOfLines[$randomKey+1];
+    echo $arrOfLines[$randomKey] . "\n";
+    echo $arrOfLines[$randomKey - 1] ?? $arrOfLines[$randomKey + 1];
 
-    return ['song_name'=>$song['name'],
-    'line_1'=> mb_strtoupper( $arrOfLines[$randomKey]),
-    'line_2'=> mb_strtoupper( $arrOfLines[$randomKey-1]?? $arrOfLines[$randomKey+1]),
-    'id'=>$song['id']
-  ];
+    return [
+      'song_name' => $song['name'],
+      'line_1' => mb_strtoupper($arrOfLines[$randomKey]),
+      'line_2' => mb_strtoupper($arrOfLines[$randomKey - 1] ?? $arrOfLines[$randomKey + 1]),
+      'id' => $song['id']
+    ];
   }
 
-  public function handleRandomLine(mixed $update, Telegram $telegram){
+  public function handleRandomLine(mixed $update, Telegram $telegram)
+  {
     $from = null;
 
     $data = $this->randomLine();
@@ -51,18 +52,17 @@ class RandTvjService
       $update = $update['callback_query'];
       $from = $update['from'];
       sleep(1);
-    }else {
+    } else {
       $from = $update['message']["from"];
     }
 
 
     $userLink = "<a href='tg://user?id={$from['id']}'>{$from['first_name']}</a>";
-    $msg ="{$userLink} какая ты строчка песни?"
-    ."\n\n\n"
-    ."<b>{$data['line_1']}</b>" . "\n"
-    ."<b>{$data['line_2']}</b>"
-    ."\n\n\n 🔎{$data['song_name']}"
-    ;
+    $msg = "{$userLink} какая ты строчка песни?"
+      . "\n\n\n"
+      . "<b>{$data['line_1']}</b>" . "\n"
+      . "<b>{$data['line_2']}</b>"
+      . "\n\n\n 🔎{$data['song_name']}";
 
     $keyboard = [
       "inline_keyboard" => [
@@ -75,19 +75,24 @@ class RandTvjService
       ]
     ];
 
-    $replyTo = $callBackQueryId? null :  $update['message']['message_id'];
+    $replyTo = $callBackQueryId ? null :  $update['message']['message_id'];
     $chatId = $update['message']['chat']['id'];
 
-    if($callBackQueryId) {
-      $telegram->editMessageText($msg, ['chat_id'=>$chatId, "parse_mode"=>'HTML'
-    ,'message_id'=>$update['message']['message_id']],$keyboard);
-      return;
+    if ($callBackQueryId) {
+      $prevUser = $update['message']['entities'][0]['user']['id'];
+      $current = $update['from']['id'];
+
+      if ($prevUser === $current) {
+
+        $telegram->editMessageText($msg, [
+          'chat_id' => $chatId, "parse_mode" => 'HTML', 'message_id' => $update['message']['message_id']
+        ], $keyboard);
+        return;
+      }
     }
 
     $telegram->sendMessage($msg, $chatId, [
-      "reply_to_message_id" => $replyTo,"parse_mode"=>'HTML'
+      "reply_to_message_id" => $replyTo, "parse_mode" => 'HTML'
     ], $keyboard);
   }
 }
-
-
