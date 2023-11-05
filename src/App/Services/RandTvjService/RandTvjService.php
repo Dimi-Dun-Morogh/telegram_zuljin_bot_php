@@ -2,28 +2,29 @@
 
 namespace App\Services\RandTvjService;
 
+use App\Db\Db;
 use App\Telegram\Telegram;
-use \SQLite3;
+
 
 class RandTvjService
 {
 
-  private $db;
 
-  public function __construct()
+
+  public function __construct(private Db $db)
   {
-    $this->db = new SQLite3(__DIR__ . '/database.db');
+
   }
 
   public function randomLine()
   {
     $totalSongs = $this->db->query('SELECT count(*) as total FROM songs');
-    $totalSongs = $totalSongs->fetchArray(SQLITE3_ASSOC)['total'];
+    $totalSongs = $totalSongs->find();
 
     $number = rand(1, $totalSongs['total']);
 
-    $song = $this->db->query("SELECT * FROM songs LIMIT $number,1");
-    $song = $song->fetchArray(SQLITE3_ASSOC);
+    $song = $this->db->query("SELECT * FROM songs LIMIT $number,1")->find();
+
 
     $arrOfLines = explode('<br>', $song['text']);
 
@@ -33,7 +34,8 @@ class RandTvjService
 
     return ['song_name'=>$song['name'],
     'line_1'=> mb_strtoupper( $arrOfLines[$randomKey]),
-    'line_2'=> mb_strtoupper( $arrOfLines[$randomKey-1]?? $arrOfLines[$randomKey+1])
+    'line_2'=> mb_strtoupper( $arrOfLines[$randomKey-1]?? $arrOfLines[$randomKey+1]),
+    'id'=>$song['id']
   ];
   }
 
@@ -55,17 +57,18 @@ class RandTvjService
 
 
     $userLink = "<a href='tg://user?id={$from['id']}'>{$from['first_name']}</a>";
-    $msg ="{$userLink} какая ты строчка ТВЖ?"
+    $msg ="{$userLink} какая ты строчка песни?"
     ."\n\n\n"
     ."<b>{$data['line_1']}</b>" . "\n"
-    // ."<b>{$data['line_2']}</b>"
+    ."<b>{$data['line_2']}</b>"
+    ."\n\n\n 🔎{$data['song_name']}"
     ;
 
     $keyboard = [
       "inline_keyboard" => [
         [
           [
-            "text" => "Какая ты строчка из твж",
+            "text" => "Какая ты строчка из песни",
             "callback_data" => "tvj"
           ]
         ]
@@ -74,6 +77,12 @@ class RandTvjService
 
     $replyTo = $callBackQueryId? null :  $update['message']['message_id'];
     $chatId = $update['message']['chat']['id'];
+
+    if($callBackQueryId) {
+      $telegram->editMessageText($msg, ['chat_id'=>$chatId, "parse_mode"=>'HTML'
+    ,'message_id'=>$update['message']['message_id']],$keyboard);
+      return;
+    }
 
     $telegram->sendMessage($msg, $chatId, [
       "reply_to_message_id" => $replyTo,"parse_mode"=>'HTML'

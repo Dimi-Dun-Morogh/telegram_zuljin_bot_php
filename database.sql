@@ -46,3 +46,11 @@ CREATE TABLE IF NOT EXISTS `admins`(
    PRIMARY KEY (`id`),
     UNIQUE (login)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `songs` (
+  `id` BIGINT AUTO_INCREMENT,
+  `name` TEXT,
+  `text` TEXT,
+  PRIMARY KEY (`id`)
+) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

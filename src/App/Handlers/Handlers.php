@@ -133,7 +133,7 @@ class  Handlers
 
   function tvjHandler(mixed $update, Telegram $telegram)
   {
-    $service = new RandTvjService();
+    $service = new RandTvjService($this->db);
     $service->handleRandomLine($update, $telegram);
   }
 }
