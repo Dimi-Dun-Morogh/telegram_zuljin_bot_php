@@ -54,3 +54,10 @@ CREATE TABLE IF NOT EXISTS `songs` (
   `text` TEXT,
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `errors` (
+  `id` BIGINT AUTO_INCREMENT,
+  `text` TEXT,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  PRIMARY KEY (`id`)
+) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

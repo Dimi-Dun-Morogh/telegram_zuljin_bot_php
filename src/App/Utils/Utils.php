@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Utils;
 
-//file_put_contents(__DIR__ . '../../../logs/log.json', $data);
+namespace App\Utils;
+use App\Db\Db;
+
 
 class Utils
 {
@@ -19,10 +20,13 @@ class Utils
     }
   }
 
-  static function writeLog(string  $fileName, $content)
+  static function writeLog(string  $fileName, $content, Db $db=null)
   {
     Utils::dirExists();
     $url = Utils::$baseLogPath . $fileName;
     file_put_contents($url, $content);
+    if($db){
+      $db->query("INSERT into errors (`text`) VALUES (:t)", ['t'=>$content]);
+    }
   }
 }

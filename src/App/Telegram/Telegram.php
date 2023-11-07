@@ -5,11 +5,12 @@ declare (strict_types = 1);
 namespace App\Telegram;
 
 use App\Utils\Utils;
+use App\Db\Db;
 
 class Telegram {
 	public string $baseUrl = 'https://api.telegram.org/bot';
 
-	public function __construct(string $apiKey) {
+	public function __construct(string $apiKey, private Db $db) {
 		$this->baseUrl = $this->baseUrl . $apiKey;
 	}
 
@@ -35,7 +36,7 @@ class Telegram {
 			// An error occurred, write error message to file
 			$error = error_get_last();
 			$message = $error['message'];
-			Utils::writeLog('logerror.txt', $message);
+			Utils::writeLog('logerror.txt', $message, $this->db);
 		}
 
 		return $data;
@@ -56,8 +57,8 @@ class Telegram {
 
 		curl_close($ch);
 		if (!$res) {
-
-			Utils::writeLog('logerror.txt', curl_error($ch) . "\n" . $url);
+			var_dump($this->db);
+			Utils::writeLog('logerror.txt', curl_error($ch) . "\n" . $url, $this->db);
 			echo 'Curl error: ' . curl_error($ch) . " " . "\n" . $url;
 		}
 

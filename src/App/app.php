@@ -19,9 +19,10 @@ $db = new Db('mysql', [
 	'dbname' => $dbConfig['dbname'],
 ], $dbConfig['user'], $dbConfig['pass']);
 
+
 $admin = new AdminService($db);
 
-$bot = new Bot(new Telegram(Config::BotKey()), new Handlers($db));
+$bot = new Bot(new Telegram(Config::BotKey(), $db), new Handlers($db));
 
 $bot->addCallback(["анекдот", "зул анекдот"], 'jokesHandler');
 $bot->addCallback(["зул вк", 'vk_next_post', 'vk_next_postrandom'], 'sfPostHandler');
@@ -51,7 +52,8 @@ try {
 		  // $bot->longPolling();
 	}
 } catch (\Throwable $th) {
-	Utils::writeLog('error.txt', $th->getMessage());
+	Utils::writeLog('error.txt', $th->getMessage(), $db);
 }
+
 
 return ['admin' => $admin, 'bot' => $bot, 'config' => ['WebHook' => Config::WebhookUrl(), 'botkey' => Config::BotKey()]];
