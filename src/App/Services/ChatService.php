@@ -129,7 +129,7 @@ class ChatService
         'chat_id' => $chat['id'],
         'user_id' => $profile['id'],
         'username' => $profile['username'],
-        'first_name' => $profile['first_name'],
+        'first_name' => iconv('UTF-8', 'UTF-8', $profile['first_name']) ,
         'last_name' => $profile['last_name'] ?? ''
       ]);
     }

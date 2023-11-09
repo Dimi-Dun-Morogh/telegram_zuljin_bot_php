@@ -73,4 +73,11 @@ class AdminService
     $data = $this->db->query($query)->findAll();
     return $data;
   }
+
+  public function getErrors()
+  {
+    $query = "SELECT * FROM errors ORDER BY 'created_at' ASC LIMIT 5";
+    $data = $this->db->query($query)->findAll();
+    return $data;
+  }
 }

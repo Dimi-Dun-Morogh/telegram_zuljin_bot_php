@@ -27,6 +27,9 @@ function dynamic() {
     case 'changepw':
       include __DIR__ . "/partials/changepw.php" ;
       break;
+    case 'errors':
+      include __DIR__ . "/partials/errors.php" ;
+      break;
     case 'main':
     default:
 

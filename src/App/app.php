@@ -19,6 +19,7 @@ $db = new Db('mysql', [
 	'dbname' => $dbConfig['dbname'],
 ], $dbConfig['user'], $dbConfig['pass']);
 
+$test = 1;
 
 $admin = new AdminService($db);
 
@@ -57,3 +58,4 @@ try {
 
 
 return ['admin' => $admin, 'bot' => $bot, 'config' => ['WebHook' => Config::WebhookUrl(), 'botkey' => Config::BotKey()]];
+
