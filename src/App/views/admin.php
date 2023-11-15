@@ -30,9 +30,11 @@ function dynamic() {
     case 'errors':
       include __DIR__ . "/partials/errors.php" ;
       break;
+    case 'chats':
+      include __DIR__ . "/partials/chats.php" ;
+      break;
     case 'main':
     default:
-
     include __DIR__ . "/partials/main.php" ;
       break;
   }

@@ -123,6 +123,7 @@ class ChatService
     $query = "SELECT * from chat_participants WHERE chat_id={$chat['id']} AND user_id={$profile['id']}";
     $data = $this->db->query($query)->find();
 
+
     if (!$data) {
       $query = "INSERT INTO chat_participants (chat_id, user_id, username, first_name, last_name) VALUES (:chat_id, :user_id, :username, :first_name, :last_name)";
       $this->db->query($query, [
@@ -132,6 +133,8 @@ class ChatService
         'first_name' => iconv('UTF-8', 'UTF-8', $profile['first_name']) ,
         'last_name' => $profile['last_name'] ?? ''
       ]);
+
+
     }
   }
 
@@ -160,7 +163,7 @@ class ChatService
     $data = $this->db->query($query)->findAll();
     // var_dump($data);
     $msg = $this->renderMsgStat($data);
-    $telegram->sendMessage($msg, $chat['id'], ['parse_mode' => 'HTML']);
+    $telegram->sendMessage($msg, $chat['id'], ['parse_mode' => 'HTML', "disable_notification"=>true]);
   }
 
   private  function renderMsgStat(mixed $data) {
@@ -169,7 +172,7 @@ class ChatService
     foreach($data as $user) {
       $id = $user['user_id'];
       $name = $user['first_name'];
-      $userLink = "✅  <b><a href='tg://user?id={$id}'>{$name}</a></b>" ;
+      $userLink = "✅  <b><a href='https://t.me/user?id={$id}'>{$name}</a></b>";
       $res .= "{$userLink} - {$user['msg_count']} " . "\r\n";
       $total += $user['msg_count'];
     }
