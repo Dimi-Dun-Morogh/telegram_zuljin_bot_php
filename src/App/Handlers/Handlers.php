@@ -148,4 +148,10 @@ class  Handlers
     $service = new ChatService($this->db);
     $service->who($update, $telegram);
   }
+
+  function whenHandler(mixed $update, Telegram $telegram)
+  {
+    $service = new ChatService($this->db);
+    $service->when($update, $telegram);
+  }
 }

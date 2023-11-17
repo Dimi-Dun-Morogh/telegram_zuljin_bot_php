@@ -42,6 +42,7 @@ $bot->addCallback(['зул стата'], "msgStatHandler");
 $bot->addCallback(['твж', 'Твж', 'tvj'], "tvjHandler");
 $bot->addCallback(['инфа'], "infoHandler");
 $bot->addCallback(['кто'], "whoHandler");
+$bot->addCallback(['когда'], "whenHandler");
 
 $bot->addCallback('onEachMessage', 'onEachMessageHandler');
 

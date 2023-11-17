@@ -214,7 +214,7 @@ class ChatService
         if (\strlen($msgText) === 0) {
             return;
         }
-        $chance  = rand(0, 100);
+        $chance = rand(0, 100);
         $from = $update['message']["from"];
 
         $msgText = "<a href='tg://user?id={$from['id']}'>{$from['first_name']}</a>, вероятность, что $msgText - $chance%";
@@ -224,22 +224,48 @@ class ChatService
 
     public function who(mixed $update, Telegram $telegram)
     {
-      $msgText = $update['message']['text'];
-      $msgText = \explode(' ', $msgText);
-      array_shift($msgText);
-      $msgText = implode(" ", $msgText);
+        $msgText = $update['message']['text'];
+        $msgText = \explode(' ', $msgText);
+        array_shift($msgText);
+        $msgText = implode(" ", $msgText);
 
-      $chatId = $update['message']['chat']['id'];
-      if (\strlen($msgText) === 0) {
-          return;
-      }
-      $from = $update['message']["from"];
-      $participants = $this->db->query("SELECT * from chat_participants WHERE chat_id=$chatId")->findAll();
+        $chatId = $update['message']['chat']['id'];
+        if (\strlen($msgText) === 0) {
+            return;
+        }
+        $from = $update['message']["from"];
+        $participants = $this->db->query("SELECT * from chat_participants WHERE chat_id=$chatId")->findAll();
 
-      $chosenOne = $participants[ array_rand($participants)];
+        $chosenOne = $participants[array_rand($participants)];
 
-      $msgText = "<b><a href='tg://user?id={$from['id']}'>{$from['first_name']}</a></b>, похоже что <b><a href='tg://user?id={$chosenOne['user_id']}'>{$chosenOne['first_name']}</a></b> <blockquote>$msgText</blockquote>";
+        $msgText = "<b><a href='tg://user?id={$from['id']}'>{$from['first_name']}</a></b>, похоже что <b><a href='tg://user?id={$chosenOne['user_id']}'>{$chosenOne['first_name']}</a></b> <blockquote>$msgText</blockquote>";
 
-      $telegram->sendMessage($msgText, $chatId);
+        $telegram->sendMessage($msgText, $chatId);
     }
+
+    public function when(mixed $update, Telegram $telegram)
+    {
+        $msgText = $update['message']['text'];
+        $msgText = \explode(' ', $msgText);
+        array_shift($msgText);
+        $msgText = implode(" ", $msgText);
+
+        $chatId = $update['message']['chat']['id'];
+        if (\strlen($msgText) === 0) {
+            return;
+        }
+        $from = $update['message']["from"];
+        $minVal = time();
+        $maxVal = time() + 31536 * 5 * 1000;
+        $randTimeStamp = rand($minVal, $maxVal);
+        $randDate = date('d-m-Y', $randTimeStamp);
+
+        $msgText = "<b><a href='tg://user?id={$from['id']}'>{$from['first_name']}</a></b>,  <blockquote>$msgText</blockquote>
+        произойдет $randDate";
+
+        $telegram->sendMessage($msgText, $chatId);
+    }
+
+    //TODO: quotes from  chat
+    //TODO: x OR y
 }

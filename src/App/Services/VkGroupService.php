@@ -79,7 +79,7 @@ class VkGroupService
     $postText = str_replace(['<'], [""], $postText);
 
     $msg = $groupName . "\r\n"
-      . "<b>" . $postText .  "</b>"  . "\r\n"  . "\r\n"
+      . "<blockquote>" . $postText .  "</blockquote>"  . "\r\n"  . "\r\n"
       . "<i>" . $authorString . "  " . $date_string . "</i>" . "\r\n"  . "\r\n"
       . "comments: " . $comments . " " . "likes: " . $likes .  "\r\n";
     $result =   [$msg, $postImage, array_key_exists('is_pinned', $post), $groupName, $offset];
