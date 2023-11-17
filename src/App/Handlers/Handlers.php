@@ -136,4 +136,16 @@ class  Handlers
     $service = new RandTvjService($this->db);
     $service->handleRandomLine($update, $telegram);
   }
+
+  function infoHandler(mixed $update, Telegram $telegram)
+  {
+    $service = new ChatService($this->db);
+    $service->info($update, $telegram);
+  }
+
+  function whoHandler(mixed $update, Telegram $telegram)
+  {
+    $service = new ChatService($this->db);
+    $service->who($update, $telegram);
+  }
 }

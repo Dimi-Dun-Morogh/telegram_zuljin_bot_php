@@ -40,6 +40,8 @@ $bot->addCallback(['new_chat_participant'], "onChatEnterHandler");
 $bot->addCallback(['left_chat_member'], "onChatLeaveHandler");
 $bot->addCallback(['зул стата'], "msgStatHandler");
 $bot->addCallback(['твж', 'Твж', 'tvj'], "tvjHandler");
+$bot->addCallback(['инфа'], "infoHandler");
+$bot->addCallback(['кто'], "whoHandler");
 
 $bot->addCallback('onEachMessage', 'onEachMessageHandler');
 
@@ -56,6 +58,14 @@ try {
 	Utils::writeLog('error.txt', $th->getMessage(), $db);
 }
 
+
+function error_handler($errno, $errstr, $errfile, $errline) {
+  echo "Error: $errstr at $errfile line $errline\n";
+	Utils::writeLog('error.txt', "$errno : $errstr : $errfile : $errline", $db);
+  die();
+}
+
+set_error_handler('error_handler');
 
 return ['admin' => $admin, 'bot' => $bot, 'config' => ['WebHook' => Config::WebhookUrl(), 'botkey' => Config::BotKey()]];
 
