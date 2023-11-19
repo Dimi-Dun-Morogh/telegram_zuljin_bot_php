@@ -267,5 +267,98 @@ class ChatService
     }
 
     //TODO: quotes from  chat
+    public function createQuote(mixed $update, Telegram $telegram)
+    {
+        // chat_id,user_id,text
+        if (!key_exists("reply_to_message", $update['message'])) {
+            return;
+        }
+
+        $chatId = $update['message']['chat']['id'];
+        $userId = $update['message']['reply_to_message']['from']['id'];
+        $text = $update['message']['reply_to_message']['text'];
+
+        $query = "INSERT INTO quotes (chat_id, user_id, text) VALUES(:chat_id, :user_id, :text)";
+        $resId = $this->db->query($query, ['chat_id' => $chatId,
+            'user_id' => $userId, 'text' => $text])->id();
+
+        $quoteStr = $this->quoteString($resId);
+        $telegram->sendMessage("цитата создана✍️\n" . $quoteStr, $chatId);
+    }
+
+    public function showQuotes(mixed $update, Telegram $telegram)
+    {
+        $isCbQuery = key_exists('callback_query', $update);
+        $singleUserMode = false;
+        $offset = 0;
+
+        $randomQuote = false;
+        $isForwardKey = true;
+        $userId = $update['message']['reply_to_message']['from']['id'];
+        if (key_exists("reply_to_message", $update['message'] ?? [])) {
+
+            $singleUserMode = true;
+        }
+
+        if ($isCbQuery) {
+            $offset = explode(':', $update['callback_query']['data'])[1] ?? 1;
+            $isForwardKey = explode(':', $update['callback_query']['data'])[2] ?? false;
+            $isForwardKey = $isForwardKey === 'F';
+            $randomQuote = str_contains($update['callback_query']['data'], 'random');
+            $update = $update['callback_query'];
+
+            $userId = $update['from']['id'];
+        }
+
+        $chatId = $update['message']['chat']['id'];
+
+        $userFilter = $singleUserMode ? " AND user_id=$userId" : '';
+        $query = "SELECT id FROM quotes WHERE chat_id=$chatId
+        $userFilter
+        ORDER BY id LIMIT 1 OFFSET $offset";
+        if ($randomQuote) {
+            $query = "SELECT id
+                  FROM quotes
+                  WHERE chat_id=$chatId
+                  $userFilter
+                  ORDER BY RAND()
+                  LIMIT 1;";
+        }
+
+
+        $data = $this->db->query($query)->find();
+
+        $quoteStr = $this->quoteString($data['id']);
+
+        $prevOffset = $offset === 0 ? 0 : $offset - 1;
+        $nextOffset = $offset + 1;
+        $keyboard = ['inline_keyboard' => [
+            [
+                ['text' => '◀️назад', "callback_data" => "quotes:$prevOffset:B"],
+                ['text' => 'вперёд▶️', "callback_data" => "quotes:$nextOffset:F"],
+            ], [
+                ['text' => 'случайная цитата', "callback_data" => "quotesrandom"],
+            ],
+        ]];
+
+        if ($isCbQuery) {
+            $telegram->editMessageText($quoteStr, ['chat_id' => $chatId, 'parse_mode' => 'HTML',
+                'message_id' => $update['message']['message_id']], $keyboard);
+            return;
+        }
+
+        $telegram->sendMessage($quoteStr, $chatId, [], $keyboard);
+    }
+
+    private function quoteString(int | string $id)
+    {
+        $quote = $this->db->query("SELECT * FROM quotes where id=$id")->find();
+
+        $user = $this->db->query("SELECT * FROM chat_participants WHERE user_id=:user_id", ['user_id' => $quote['user_id']])->find();
+        $userLink = "<a href='tg://user?id={$user['user_id']}'>{$user['first_name']}</a>";
+        $quoteString = "<blockquote>{$quote['text']}</blockquote>$userLink  {$quote['created_at']} 🗄";
+
+        return $quoteString;
+    }
     //TODO: x OR y
 }

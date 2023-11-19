@@ -61,3 +61,19 @@ CREATE TABLE IF NOT EXISTS `errors` (
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+
+-- ---
+-- Table 'chat_participants'
+--
+-- ---
+
+CREATE TABLE IF NOT EXISTS `quotes`(
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `chat_id` BIGINT(30) NOT NULL,
+  `user_id` BIGINT(30) NOT NULL,
+  `text` text NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+   PRIMARY KEY (`id`),
+   FOREIGN KEY(chat_id) REFERENCES chats(chat_id)
+)  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

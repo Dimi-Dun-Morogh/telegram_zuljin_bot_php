@@ -154,4 +154,16 @@ class  Handlers
     $service = new ChatService($this->db);
     $service->when($update, $telegram);
   }
+
+  function createQuoteHandler(mixed $update, Telegram $telegram)
+  {
+    $service = new ChatService($this->db);
+    $service->createQuote($update, $telegram);
+  }
+
+  function showQuotesHandler(mixed $update, Telegram $telegram)
+  {
+    $service = new ChatService($this->db);
+    $service->showQuotes($update, $telegram);
+  }
 }

@@ -43,6 +43,8 @@ $bot->addCallback(['твж', 'Твж', 'tvj'], "tvjHandler");
 $bot->addCallback(['инфа'], "infoHandler");
 $bot->addCallback(['кто'], "whoHandler");
 $bot->addCallback(['когда'], "whenHandler");
+$bot->addCallback(['цит'], "createQuoteHandler");
+$bot->addCallback(['циты', 'цитаты', 'quotes', 'quotesrandom'], "showQuotesHandler");
 
 $bot->addCallback('onEachMessage', 'onEachMessageHandler');
 
@@ -53,7 +55,7 @@ try {
 
 	if (Config::AppMode() === 'DEV') {
 
-		  //  $bot->longPolling();
+		   $bot->longPolling();
 	}
 } catch (\Throwable $th) {
 	Utils::writeLog('error.txt', $th->getMessage(), $db);
