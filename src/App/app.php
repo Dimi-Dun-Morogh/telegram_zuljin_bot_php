@@ -45,6 +45,8 @@ $bot->addCallback(['кто'], "whoHandler");
 $bot->addCallback(['когда'], "whenHandler");
 $bot->addCallback(['цит'], "createQuoteHandler");
 $bot->addCallback(['циты', 'цитаты', 'quotes', 'quotesrandom'], "showQuotesHandler");
+$bot->addCallback(['nofap', 'нофап'], "nfHandler");
+$bot->addCallback(['setnf'], "setNfHandler");
 
 $bot->addCallback('onEachMessage', 'onEachMessageHandler');
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 namespace App\Utils;
 use App\Db\Db;
+use DateInterval;
 
 
 class Utils
@@ -29,4 +30,16 @@ class Utils
       $db->query("INSERT into errors (`text`) VALUES (:t)", ['t'=>$content]);
     }
   }
+
+  static function format_interval(DateInterval $interval) {
+    $result = "";
+    if ($interval->y) { $result .= $interval->format("%y лет "); }
+    if ($interval->m) { $result .= $interval->format("%m месяцев "); }
+    if ($interval->d) { $result .= $interval->format("%d дней "); }
+    // if ($interval->h) { $result .= $interval->format("%h часов "); }
+    // if ($interval->i) { $result .= $interval->format("%i минут "); }
+    // if ($interval->s) { $result .= $interval->format("%s секунд "); }
+    if(!$result) $result.="0 дней";
+    return $result;
+}
 }

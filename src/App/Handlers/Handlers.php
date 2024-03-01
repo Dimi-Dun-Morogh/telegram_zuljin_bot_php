@@ -9,6 +9,7 @@ use App\Services\CommonService;
 use App\Services\JokeService;
 use App\Services\VkGroupService;
 use App\Services\WeatherService;
+use App\Services\NfService;
 use App\Telegram\Telegram;
 use App\Db\Db;
 use App\Services\RandTvjService\RandTvjService;
@@ -165,5 +166,16 @@ class  Handlers
   {
     $service = new ChatService($this->db);
     $service->showQuotes($update, $telegram);
+  }
+
+  function nfHandler(mixed $update, Telegram $telegram)
+  {
+    $service = new NfService($this->db);
+    $service->nfInfo($update, $telegram);
+  }
+  function setNfHandler(mixed $update, Telegram $telegram)
+  {
+    $service = new NfService($this->db);
+    $service->setNf($update, $telegram);
   }
 }

@@ -77,3 +77,19 @@ CREATE TABLE IF NOT EXISTS `quotes`(
    PRIMARY KEY (`id`),
    FOREIGN KEY(chat_id) REFERENCES chats(chat_id)
 )  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- ---
+-- Table 'nfs'
+--
+-- ---
+
+CREATE TABLE IF NOT EXISTS `nfs`(
+   `user_id` BIGINT(30) NOT NULL,
+  `chat_id` BIGINT(30) NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  `nf_timer` DATETIME NOT NULL,
+  `fails` INT DEFAULT 0,
+   PRIMARY KEY (`user_id`),
+   FOREIGN KEY(chat_id) REFERENCES chats(chat_id)
+)  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

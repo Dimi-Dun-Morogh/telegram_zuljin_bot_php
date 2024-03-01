@@ -309,6 +309,9 @@ class ChatService
 
             $userId = $update['from']['id'];
         }
+        if(!$isCbQuery) {
+            $randomQuote = true;
+        }
 
         $chatId = $update['message']['chat']['id'];
 
@@ -327,6 +330,7 @@ class ChatService
 
 
         $data = $this->db->query($query)->find();
+        if(!$data)return;
 
         $quoteStr = $this->quoteString($data['id']);
 
