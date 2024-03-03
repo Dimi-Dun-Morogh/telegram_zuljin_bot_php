@@ -182,7 +182,7 @@ class ChatService
     LIMIT 20
     ";
         $data = $this->db->query($query)->findAll();
-        // var_dump($data);
+
         $msg = $this->renderMsgStat($data);
         $telegram->sendMessage($msg, $chat['id'], ['parse_mode' => 'HTML', "disable_notification" => true]);
     }
@@ -288,12 +288,16 @@ class ChatService
 
     public function showQuotes(mixed $update, Telegram $telegram)
     {
+
         $isCbQuery = key_exists('callback_query', $update);
         $singleUserMode = false;
         $offset = 0;
 
         $randomQuote = false;
         $isForwardKey = true;
+        $buttonOwner = null;
+        $from = $update['message']["from"];
+
         $userId = $update['message']['reply_to_message']['from']['id'];
         if (key_exists("reply_to_message", $update['message'] ?? [])) {
 
@@ -308,17 +312,20 @@ class ChatService
             $update = $update['callback_query'];
 
             $userId = $update['from']['id'];
+            $from = $update['from'];
         }
-        if(!$isCbQuery) {
+        if (!$isCbQuery) {
             $randomQuote = true;
         }
 
+        $userLink = "<a href='tg://user?id={$from['id']}'>{$from['first_name']}</a>";
         $chatId = $update['message']['chat']['id'];
 
         $userFilter = $singleUserMode ? " AND user_id=$userId" : '';
         $query = "SELECT id FROM quotes WHERE chat_id=$chatId
         $userFilter
         ORDER BY id LIMIT 1 OFFSET $offset";
+
         if ($randomQuote) {
             $query = "SELECT id
                   FROM quotes
@@ -328,13 +335,16 @@ class ChatService
                   LIMIT 1;";
         }
 
-
         $data = $this->db->query($query)->find();
-        if(!$data)return;
+        if (!$data) {
+            return;
+        }
 
         $quoteStr = $this->quoteString($data['id']);
 
+        $msg = "Цитата из чата для $userLink\n\n" . $quoteStr;
         $prevOffset = $offset === 0 ? 0 : $offset - 1;
+
         $nextOffset = $offset + 1;
         $keyboard = ['inline_keyboard' => [
             [
@@ -346,12 +356,22 @@ class ChatService
         ]];
 
         if ($isCbQuery) {
-            $telegram->editMessageText($quoteStr, ['chat_id' => $chatId, 'parse_mode' => 'HTML',
-                'message_id' => $update['message']['message_id']], $keyboard);
+
+            $prevUser = $update['message']['entities'][0]['user']['id'];
+            $current = $userId;
+            if ($prevUser === $current) {
+
+                $telegram->editMessageText($msg, [
+                    'chat_id' => $chatId, "parse_mode" => 'HTML', 'message_id' => $update['message']['message_id'],
+                ], $keyboard);
+                return;
+            } else {
+                $telegram->sendMessage($msg, $chatId, [], $keyboard);
+            }
             return;
         }
 
-        $telegram->sendMessage($quoteStr, $chatId, [], $keyboard);
+        $telegram->sendMessage($msg, $chatId, [], $keyboard);
     }
 
     private function quoteString(int | string $id)
@@ -360,7 +380,7 @@ class ChatService
 
         $user = $this->db->query("SELECT * FROM chat_participants WHERE user_id=:user_id", ['user_id' => $quote['user_id']])->find();
         $userLink = "<a href='tg://user?id={$user['user_id']}'>{$user['first_name']}</a>";
-        $quoteString = "<blockquote>{$quote['text']}</blockquote>$userLink  {$quote['created_at']} 🗄";
+        $quoteString = "<blockquote>{$quote['text']}</blockquote>автор - $userLink  {$quote['created_at']} 🗄";
 
         return $quoteString;
     }
