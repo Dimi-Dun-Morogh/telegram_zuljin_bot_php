@@ -125,6 +125,9 @@ class  Handlers
     $service->createChatUser($update);
 
     $service->updMsgCount($update);
+
+    //piss off
+    $service->noForwarding($update, $telegram);
   }
 
   function msgStatHandler(mixed $update, Telegram $telegram) {

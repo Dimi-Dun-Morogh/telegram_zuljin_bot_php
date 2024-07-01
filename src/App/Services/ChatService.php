@@ -276,6 +276,11 @@ class ChatService
 
         $chatId = $update['message']['chat']['id'];
         $userId = $update['message']['reply_to_message']['from']['id'];
+        $creatorId = $update['message']['from']['id'];
+        if($creatorId == $userId) {
+            $telegram->sendMessage("самому себя записывать нельзя", $chatId);
+            return;
+        }
         $text = $update['message']['reply_to_message']['text'];
 
         $query = "INSERT INTO quotes (chat_id, user_id, text) VALUES(:chat_id, :user_id, :text)";
@@ -384,5 +389,20 @@ class ChatService
 
         return $quoteString;
     }
+    // TODO  dont hardcode userids, create them in DB
+    public function noForwarding(mixed $update, Telegram $telegram) {
+        $chatId = $update['message']['chat']['id'];
+        $messageId = $update['message']['message_id'];
+        if (key_exists("forward_sender_name", $update['message'])) {
+            $forwardedFrom = $update['message']['forward_from']['id'];
+
+            if($update['message']['forward_sender_name'] ==  'Sashbek') {
+
+                $telegram->deleteMessage($chatId, $messageId);
+                $telegram->sendVideoById($chatId, "BAACAgIAAx0CTP-A9QACE-lmgl6m20MStZgfHPJSbEhbTxq1IAACUEoAAtShGEhRyOXYZrcHNjUE", "САНЯХС");
+            }
+        }
+    }
+
     //TODO: x OR y
 }

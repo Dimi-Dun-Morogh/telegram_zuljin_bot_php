@@ -212,4 +212,10 @@ class Telegram
         $url = $this->baseUrl . "/deleteMessage?chat_id=" . $chatId . "&message_id=" . $messageId;
         $this->cGet($url);
     }
+
+    public function sendVideoById(string | int $chatId, string $fileId, string $caption)
+    {
+        $url = $this->baseUrl . "/sendVideo?chat_id=" . $chatId . "&video=" . $fileId . "&caption=" .$caption;
+        $this->cGet($url);
+    }
 }
