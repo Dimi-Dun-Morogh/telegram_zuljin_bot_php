@@ -129,6 +129,23 @@ class ChatService
         $telegram->sendMessage($messsage, $chat['id']);
     }
 
+    public function onChatLeaveSG(mixed $update, Telegram $telegram)
+    {
+        $chat = $update['chat_member']['chat'];
+        $profile = $update['chat_member']['from'];
+        if ($profile['is_bot']) {
+            return;
+        }
+
+        $chatData = $this->getChat($chat['id']);
+        if (!$chatData || !$chatData['leave_message']) {
+            return;
+        }
+
+        $messsage = "{$profile['first_name']} {$chatData['leave_message']}";
+        $telegram->sendMessage($messsage, $chat['id']);
+    }
+
     public function createChatUser(mixed $update)
     {
         $chat = $update['message']['chat'];

@@ -115,6 +115,11 @@ class  Handlers
     $service->onChatLeave($update, $telegram);
   }
 
+  function onChatLeaveHandlerSG(mixed $update, Telegram $telegram)
+  {
+    $service = new ChatService($this->db);
+    $service->onChatLeaveSG($update, $telegram);
+  }
 
   function onEachMessageHandler(mixed $update, Telegram $telegram){
     if(key_exists('callback_query', $update)) return;

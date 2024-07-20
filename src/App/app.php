@@ -38,6 +38,8 @@ $bot->addCallback(["/greet_add"], "updateGreetHandler");
 $bot->addCallback(["/leave_add"], "updateLeaveHandler");
 $bot->addCallback(['new_chat_participant'], "onChatEnterHandler");
 $bot->addCallback(['left_chat_member'], "onChatLeaveHandler");
+//!
+$bot->addCallback(['chat_member_left'], "onChatLeaveHandlerSG");
 $bot->addCallback(['зул стата'], "msgStatHandler");
 $bot->addCallback(['твж', 'Твж', 'tvj'], "tvjHandler");
 $bot->addCallback(['инфа'], "infoHandler");

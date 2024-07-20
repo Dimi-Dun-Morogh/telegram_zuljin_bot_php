@@ -26,9 +26,14 @@ class Bot
       $this->onEachMessage($update, $this->telegram);
 
       $command = $this->getCommand($update);
-    } else if ($update['callback_query']) {
+    }
+    if ($update['callback_query']) {
 
       $command = explode(':', $update['callback_query']['data'])[0];
+    }
+
+    else if (array_key_exists('chat_member', $update)) {
+       $command = 'chat_member_' . $update['chat_member']['new_chat_member']['status'];
     };
 
 
@@ -92,7 +97,7 @@ class Bot
     $lastUpdateId = null;
 
     while (true) {
-      $params = ['limit' => 1, 'offset' => $lastUpdateId];
+      $params = ['limit' => 1, 'offset' => $lastUpdateId, 'allowed_updates'=>["update_id","chat_member","callback_query","message"]];
 
       $update = $this->telegram->getUpdates($params);
 
