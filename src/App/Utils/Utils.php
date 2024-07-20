@@ -6,7 +6,7 @@ declare(strict_types=1);
 namespace App\Utils;
 use App\Db\Db;
 use DateInterval;
-
+use Config\Config;
 
 class Utils
 {
@@ -23,12 +23,16 @@ class Utils
 
   static function writeLog(string  $fileName, $content, Db $db=null)
   {
-    Utils::dirExists();
-    $url = Utils::$baseLogPath . $fileName;
-    file_put_contents($url, $content);
+
     if($db){
       $db->query("INSERT into errors (`text`) VALUES (:t)", ['t'=>$content]);
     }
+    if (Config::AppMode() === 'DEV') {
+      Utils::dirExists();
+      $url = Utils::$baseLogPath . $fileName;
+      file_put_contents($url, $content);
+    }
+
   }
 
   static function format_interval(DateInterval $interval) {
