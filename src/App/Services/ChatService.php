@@ -109,6 +109,7 @@ class ChatService
         }
 
         $messsage = "{$profile['first_name']} {$chatData['greet_message']}";
+        sleep(2);
         $telegram->sendMessage($messsage, $chat['id']);
     }
 
